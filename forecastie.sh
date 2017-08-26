@@ -25,4 +25,5 @@ if [ -n "$CERTS" ]; then
 	cp -f app/build/outputs/apk/forecastie.apk $PRODUCT_OUT_PATH
 else
 	./gradlew assembleDebug
+	cp -f app/build/outputs/apk/app-debug.apk $PRODUCT_OUT_PATH/forecastie.apk
 fi
