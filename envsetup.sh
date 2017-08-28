@@ -22,10 +22,26 @@ EOF
 # option to signature path
 }
 
+function set_javahome()
+{
+    if [ -z "$JAVA_HOME" ]; then
+        JAVA_HOME="$(realpath $(dirname $(readlink -f $(which javac)))/..)"
+	[ -d "$JAVA_HOME" ] || unset JAVA_HOME
+    fi
+    if [ -z "$JAVA_HOME" ]; then
+        echo "Enter the directory of your OpenJDK installation:"
+	read JAVA_HOME
+    fi
+    export JAVA_HOME
+}
 
 function set_ndkpath()
 {
 # ndk path
+    if [ -z "$ANDROID_NDK_PATH" ] ; then
+        [ -d /opt/android-ndk ] && ANDROID_NDK_PATH=/opt/android-ndk
+        [ -d ~/Android/Sdk/ndk-bundle ] && ANDROID_NDK_PATH=$(realpath ~/Android/Sdk/ndk-bundle)
+    fi
     if [ -z "$ANDROID_NDK_PATH" ] ; then
         echo "Enter Android ndk path:"
         read ANDROID_NDK_PATH
@@ -38,6 +54,11 @@ function set_ndkpath()
 function set_sdkpath()
 {
 # sdk path
+    if [ -z "$ANDROID_SDK_PATH" ] ; then
+        [ -d /opt/android-sdk-linux ] && ANDROID_SDK_PATH=/opt/android-sdk-linux
+        [ -d /opt/android-sdk ] && ANDROID_SDK_PATH=/opt/android-sdk
+        [ -d ~/Android/Sdk ] && ANDROID_SDK_PATH=$(realpath ~/Android/Sdk)
+    fi
     if [ -z "$ANDROID_SDK_PATH" ] ; then
         echo "Enter Android sdk path:"
         read ANDROID_SDK_PATH
@@ -131,6 +152,9 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
+
+# set JAVA_HOME
+set_javahome
 
 # set ndk path
 set_ndkpath
