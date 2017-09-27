@@ -1,18 +1,20 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
+OUTAPK=./app/build/outputs/apk/app-release.apk
+MODULE=fdroidclient
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d mintube ] || git clone git@github.com:imshyam/mintube --branch v0.91 --single-branch
+[ -d $MODULE ] || git clone https://gitlab.com/fdroid/fdroidclient.git --branch 1.0-alpha3 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
 fi
 
-cd mintube
-chmod +x gradlew
+cd $MODULE
+echo "HACL>>..$MODULE"
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
@@ -35,9 +37,8 @@ android {
 }
 EOF
 	fi
-	./gradlew assembleRelease
-	cp -f app/build/outputs/apk/app-release.apk $PRODUCT_OUT_PATH/mintube.apk
+	./gradlew clean assembleRelease
+	cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
-	./gradlew assembleDebug
-	cp -f app/build/outputs/apk/app-debug.apk $PRODUCT_OUT_PATH/mintube-debug.apk
+    echo "WARNING: Debug build is not supported"
 fi

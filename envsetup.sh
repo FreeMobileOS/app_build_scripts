@@ -1,3 +1,4 @@
+#!/bin/sh
 # script to setup environment for app build
 
 function warn_msg()
