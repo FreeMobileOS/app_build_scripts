@@ -19,7 +19,8 @@ echo "Building k9mail.."
 
 echo "zipalign k9mail.."
 # Alternatively, instead of adding to build.gradle above:
-zipalign -v -p 8 k9mail/build/outputs/apk/k9mail-release-unsigned.apk k9mail/build/outputs/apk/k9mail-release-unsigned-aligned.apk
+ZIPALIGN_CMD_PATH=$(find $ANDROID_HOME -name zipalign | head -n 1)
+$ZIPALIGN_CMD_PATH -v -p 8 k9mail/build/outputs/apk/k9mail-release-unsigned.apk k9mail/build/outputs/apk/k9mail-release-unsigned-aligned.apk
 
 echo "sigining k9mail..:$CERTS"
 APKSIGN_CMD_PATH=$(find $ANDROID_HOME -name apksigner | head -n 1)
