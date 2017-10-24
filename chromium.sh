@@ -42,11 +42,17 @@ fi
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -e secret-keys/aosp/fmo.jks ]; then
 	APKSIGN_CMD_PATH=$(find $ANDROID_HOME -name apksigner | head -n 1)
-	$APKSIGN_CMD_PATH sign --ks secret-keys/aosp/fmo.jks --ks-pass file:secret-keys/aosp/password --out $PRODUCT_OUT_PATH/chromium.apk chromium/src/out/Release/apks/MonochromePublic.apk
+	if $USE_MONOCHROME; then
+		$APKSIGN_CMD_PATH sign --ks secret-keys/aosp/fmo.jks --ks-pass file:secret-keys/aosp/password --out $PRODUCT_OUT_PATH/chromium.apk out/Release/apks/MonochromePublic.apk
+	else
+		for i in out/Release/apks/*.apk; do
+			$APKSIGN_CMD_PATH sign --ks secret-keys/aosp/fmo.jks --ks-pass file:secret-keys/aosp/password --out $PRODUCT_OUT_PATH/$(basename "$i") "$i"
+		done
+	fi
 else
 	if $USE_MONOCHROME; then
-		cp chromium/src/out/Release/apks/MonochromePublic.apk $PRODUCT_OUT_PATH/chromium.apk
+		cp out/Release/apks/MonochromePublic.apk $PRODUCT_OUT_PATH/chromium.apk
 	else
-		cp chromium/src/out/Release/apks/*.apk $PRODUCT_OUT_PATH/
+		cp out/Release/apks/*.apk $PRODUCT_OUT_PATH/
 	fi
 fi
