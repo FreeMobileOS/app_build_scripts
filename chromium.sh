@@ -1,7 +1,7 @@
 #!/bin/sh
 # For a list of current Android compatible versions, see
 # http://omahaproxy.appspot.com/
-GN_ARGS='target_os="android" target_cpu="arm64"'
+GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true'
 # FIXME should probably switch to
 # GN_ARGS='target_os="android" target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="ChromeOS" enable_hevc_demuxing=true'
 # to get more codecs supported... But this causes ffmpeg build breakages without patching the code
@@ -23,7 +23,7 @@ cd chromium
 fetch --nohooks --no-history android
 cd src
 echo "target_os = [ 'android' ]" >>../.gclient
-gclient sync
+gclient sync --with_branch_heads
 gclient runhooks
 # Version numbers from http://omahaproxy.appspot.com/
 #git checkout -b stable tags/61.0.3163.98
