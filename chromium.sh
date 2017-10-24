@@ -8,7 +8,7 @@ GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build
 # 
 # Monochrome is supposed to be a combined Chromium and Webview APK. Current tests show it not
 # actually replacing the system webview though.
-USE_MONOCHROME=false
+[ -z "$USE_MONOCHROME" ] && USE_MONOCHROME=false
 
 MYDIR="$(dirname $(realpath $0))"
 cd $MYDIR
