@@ -1,10 +1,14 @@
 #!/bin/sh
 # For a list of current Android compatible versions, see
 # http://omahaproxy.appspot.com/
-GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true'
+GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="ChromeOS" proprietary_codecs=true enable_remoting=true'
 # FIXME should probably switch to
 # GN_ARGS='target_os="android" target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="ChromeOS" enable_hevc_demuxing=true'
 # to get more codecs supported... But this causes ffmpeg build breakages without patching the code
+# 
+# Monochrome is supposed to be a combined Chromium and Webview APK. Current tests show it not
+# actually replacing the system webview though.
+USE_MONOCHROME=false
 
 MYDIR="$(dirname $(realpath $0))"
 cd $MYDIR
@@ -29,12 +33,20 @@ gclient runhooks
 #git checkout -b stable tags/61.0.3163.98
 
 gn gen --args="${GN_ARGS}" out/Release
-ninja -C out/Release monochrome_public_apk
+if $USE_MONOCHROME; then
+	ninja -C out/Release monochrome_public_apk
+else
+	ninja -C out/Release system_webview_apk chrome_modern_public_apk
+fi
 
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -e secret-keys/aosp/fmo.jks ]; then
 	APKSIGN_CMD_PATH=$(find $ANDROID_HOME -name apksigner | head -n 1)
 	$APKSIGN_CMD_PATH sign --ks secret-keys/aosp/fmo.jks --ks-pass file:secret-keys/aosp/password --out $PRODUCT_OUT_PATH/chromium.apk chromium/src/out/Release/apks/MonochromePublic.apk
 else
-	cp chromium/src/out/Release/apks/MonochromePublic.apk $PRODUCT_OUT_PATH/chromium.apk
+	if $USE_MONOCHROME; then
+		cp chromium/src/out/Release/apks/MonochromePublic.apk $PRODUCT_OUT_PATH/chromium.apk
+	else
+		cp chromium/src/out/Release/apks/*.apk $PRODUCT_OUT_PATH/
+	fi
 fi
