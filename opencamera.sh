@@ -2,7 +2,7 @@
 MYDIR="$(dirname $(realpath $0))"
 OUTAPK=app/build/outputs/apk/app-release.apk
 MODULE=opencamera
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
@@ -14,6 +14,8 @@ if [ -d secret-keys ]; then
 fi
 
 cd $MODULE
+# We don't run on prehistoric AOSP -- using Camera2 is safe
+update_parameter app/src/main/res/xml/preferences.xml preference_use_camera2 true
 echo "HACL>>..$MODULE"
 
 if [ -n "$CERTS" ]; then
