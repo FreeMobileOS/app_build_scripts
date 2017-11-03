@@ -1,6 +1,6 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=app/build/outputs/apk/app-release.apk
+OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=opencamera
 . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
