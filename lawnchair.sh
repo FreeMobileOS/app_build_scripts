@@ -7,7 +7,7 @@ MODULE=Lawnchair
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:Deletescape-Media/$MODULE -b alpha --single-branch
+[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/$MODULE -b fmo-alpha --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
@@ -16,6 +16,10 @@ fi
 cd $MODULE
 # Permissions seem to be messed up in upstream's git repository
 chmod +x gradlew
+
+# require to package with sign other than travis
+export TRAVIS_EVENT_TYPE="pull_request"
+
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
 	if ! grep -q fmo.jks app/build.gradle; then
