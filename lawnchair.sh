@@ -45,10 +45,30 @@ android {
 	}
 }
 EOF
+# insert signature to lawnfeed also
+		cat >>lawnfeed/build.gradle <<EOF
+android {
+	signingConfigs {
+		release {
+			storeFile file("$CERTS/aosp/fmo.jks")
+			storePassword "$P"
+			keyAlias "apps"
+			keyPassword "$P"
+		}
+	}
+	buildTypes {
+		release {
+			signingConfig signingConfigs.release
+		}
+	}
+}
+EOF
 	fi
     ./gradlew clean assembleRelease
 	cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
+    cp -f lawnfeed/build/outputs/apk/release/lawnfeed-release.apk $PRODUCT_OUT_PATH/Lawnfeed.apk
 else
 	./gradlew clean assembleDebug
 	cp -f app/build/outputs/apk/debug/app-debug.apk $PRODUCT_OUT_PATH/$MODULE.apk
+    cp -f lawnfeed/build/outputs/apk/debug/lawnfeed-debug.apk $PRODUCT_OUT_PATH/Lawnfeed.apk
 fi
