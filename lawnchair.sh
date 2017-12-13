@@ -17,6 +17,10 @@ fi
 cd $MODULE
 # Permissions seem to be messed up in upstream's git repository
 chmod +x gradlew
+# change targetSdkVersion to fix crash error on 8.1.0
+T_OLD="argetSdkVersion 27"
+T_NEW="argetSdkVersion 22"
+sed -i "s/$T_OLD/$T_NEW/g" app/build.gradle
 
 # require to package with sign other than travis
 export TRAVIS_EVENT_TYPE="pull_request"
@@ -42,7 +46,7 @@ android {
 }
 EOF
 	fi
-	./gradlew clean assembleRelease
+    ./gradlew clean assembleRelease
 	cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
 	./gradlew clean assembleDebug
