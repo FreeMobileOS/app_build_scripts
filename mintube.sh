@@ -5,7 +5,7 @@ MYDIR="$(dirname $(realpath $0))"
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d mintube ] || git clone git@github.com:imshyam/mintube --branch v0.91 --single-branch
+[ -d mintube ] || git clone git@github.com:imshyam/mintube --branch v0.96 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
