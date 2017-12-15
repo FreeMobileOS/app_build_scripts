@@ -127,6 +127,7 @@ function set_outpath()
 function set_androidsrcpath() {
 	# android path
 	echo "android source path (make sure build is done before) for signing apk using platform key"
+	[ -z "$ANDROID_SRC_PATH" -a -d "/media/space/AOSP/fmo-8.1.0" ] && export ANDROID_SRC_PATH=/media/space/AOSP/fmo-8.1.0
 	if [ -z "$ANDROID_SRC_PATH" ] ; then
 		echo "Enter Android src path:"
 		read srcpath
@@ -140,9 +141,11 @@ function set_androidsrcpath() {
 
 function set_approotpath() {
 	# application root path
-	if [ -z "$APP_ROOT_PATH" ] ; then
+	if [ "$APP_ROOT_PATH" = "prompt" ] ; then
 		echo "Enter App root path:"
 		read APP_ROOT_PATH
+	elif [ -z "$APP_ROOT_PATH" ]; then
+		export APP_ROOT_PATH="`mktemp -d /tmp/appbuild.XXXXXX`"
 	fi
 	echo "Application root:$APP_ROOT_PATH"
 	export APP_ROOT_PATH=$APP_ROOT_PATH
