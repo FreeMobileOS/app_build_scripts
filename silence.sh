@@ -4,10 +4,11 @@ OUTAPK=build/outputs/apk/silence-release.apk
 MODULE=silence
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
+[ -z "$VERSION" ] && VERSION=v0.16.6-unstable
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:SilenceIM/Silence.git $MODULE --branch v0.16.4-unstable --single-branch
+[ -d $MODULE ] || git clone git@github.com:SilenceIM/Silence.git $MODULE --depth 1 --branch "$VERSION" --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys

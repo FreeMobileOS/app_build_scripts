@@ -1,13 +1,13 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=app/build/outputs/apk/wire-prod-release-2.40.99999.apk
+[ -z "$VERSION" ] && VERSION=2.42.364
 MODULE=wire-android
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:wireapp/wire-android  --branch release --single-branch
+[ -d $MODULE ] || git clone git@github.com:wireapp/wire-android --depth 1 --branch ${VERSION} --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
@@ -37,7 +37,7 @@ android {
 EOF
 	fi
 	./gradlew assembleRelease
-	cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
+	cp -f app/build/outputs/apk/wire-prod-release-*.apk $PRODUCT_OUT_PATH/$MODULE.apk
 else
-    echo "WARNING: Debug build is not supported"
+	echo "WARNING: Debug build is not supported"
 fi

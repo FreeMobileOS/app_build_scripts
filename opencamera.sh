@@ -4,10 +4,11 @@ OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=opencamera
 . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
+[ -z "$VERSION" ] && VERSION="v1.42"
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git://git.code.sf.net/p/opencamera/code $MODULE
+[ -d $MODULE ] || git clone --depth 1 -b ${VERSION} git://git.code.sf.net/p/opencamera/code $MODULE
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
