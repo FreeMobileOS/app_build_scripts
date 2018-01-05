@@ -1,11 +1,11 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d forecastie ] || git clone git@github.com:FreeMobileOS/forecastie
+[ -d forecastie ] || git clone --depth 1 git@github.com:FreeMobileOS/forecastie
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
@@ -13,10 +13,13 @@ if [ -d secret-keys ]; then
 	# We prefer using our own API key because there's a limited number
 	# of permitted requests using the API key per minute, and upstream
 	# Forecastie tends to get too many, causing errors.
-	sed -i -e "s,78dfe9e10dd180fadd805075dd1a10d6,$KEY," forecastie/app/src/main/res/values/keys.xml
+	sed -i -e "s,3e29e62e2ddf6dd3d2ebd28aed069215,$KEY," forecastie/app/src/main/res/values/keys.xml
 fi
 
 cd forecastie
+
+# Use a generic name...
+autoTranslate app/src/main/res/values/strings.xml app_name Weather
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"

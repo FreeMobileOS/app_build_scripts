@@ -22,7 +22,6 @@ unset NEED_NDK
 unset NEED_SRC
 unset NEED_ROOTPATH
 
-set -x
 git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 export PATH=/opt/legacy:$PATH:$(pwd)/depot_tools
 mkdir chromium
@@ -65,6 +64,44 @@ fi
 # will give our first build, done on 2017/11/03, a nice round number.
 VERCODE=$((379828897+$(date +%Y%m%d)))
 find . -name AndroidManifest.xml |xargs sed -i -e "s,android:versionCode=\"1\",android:versionCode=\"$VERCODE\",g"
+
+# Let's not expect a "stupid user" knows what Chromium is...
+# And a more generic name should be translatable.
+#
+# lint throws a tantrum on any strings that aren't translated
+# into every language, so let's do our best...
+#
+for lng in am ar bg ca cs da de el es es-rUS fa fi fr hi hr hu in it iw ja ko lt lv nb nl pl pt-rBR pt-rPT ro ru sk sl sr sv sw th tl tr uk vi zh-rCN zh-rTW; do
+	rm -rf chrome/android/java/res_chromium/values-$lng
+	cp -a chrome/android/java/res_chromium/values chrome/android/java/res_chromium/values-$lng
+	case $lng in
+	de)
+		INTERNET="Internet"
+		INTERNET_BOOKMARKS="Internet-Lesezeichen"
+		INTERNET_SEARCH="Internet-Suche"
+		;;
+	*)
+		INTERNET="$(translate $lng Internet)"
+		INTERNET_BOOKMARKS="$(translate $lng Internet Bookmarks)"
+		INTERNET_SEARCH="$(translate $lng Internet Search)"
+		;;
+	esac
+	# Let's fall back to English if translate.googleapis.com messed up...
+	[ -z "$INTERNET" ] && INTERNET="Internet"
+	[ -z "$INTERNET_BOOKMARKS" ] && INTERNET_BOOKMARKS="Internet Bookmarks"
+	[ -z "$INTERNET_SEARCH" ] && INTERNET_SEARCH="Internet Search"
+
+	echo $lng: $INTERNET_BOOKMARKS
+
+	set -x
+	sed -i -e "s,<string name=\"app_name\" translatable=\"false\">Chromium</string>,<string name=\"app_name\">$INTERNET</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
+	sed -i -e "s,<string name=\"bookmark_widget_title\" translatable=\"false\">Chromium bookmarks</string>,<string name=\"bookmark_widget_title\">$INTERNET_BOOKMARKS</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
+	sed -i -e "s,<string name=\"search_widget_title\" translatable=\"false\">Chromium search</string>,<string name=\"search_widget_title\">$INTERNET_SEARCH</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
+	set +x
+done
+sed -i -e 's,<string name="app_name" translatable="false">Chromium</string>,<string name="app_name">Internet</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
+sed -i -e 's,<string name="bookmark_widget_title" translatable="false">Chromium bookmarks</string>,<string name="bookmark_widget_title">Internet Bookmarks</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
+sed -i -e 's,<string name="search_widget_title" translatable="false">Chromium search</string>,<string name="search_widget_title">Internet Search</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
 
 gn gen --args="${GN_ARGS}" out/Release
 if $USE_MONOCHROME; then

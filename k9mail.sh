@@ -1,6 +1,6 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
@@ -13,6 +13,11 @@ if [ -d secret-keys ]; then
 fi
 
 cd k9mail
+
+# Use generic names
+autoTranslate k9mail/src/main/res/values/strings.xml app_name E-Mail
+autoTranslate k9mail/src/main/res/values/strings.xml shortcuts_title "E-Mail Accounts"
+autoTranslate k9mail/src/main/res/values/strings.xml unread_widget_label "Unread email"
 
 echo "Building k9mail.."
 ./gradlew clean assembleRelease

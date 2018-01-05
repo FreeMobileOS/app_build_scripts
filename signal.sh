@@ -3,7 +3,7 @@ MYDIR="$(dirname $(realpath $0))"
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
-VERSION=4.14.7
+VERSION=4.14.10
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -14,6 +14,8 @@ if [ -d secret-keys ]; then
 fi
 
 cd Signal-Android
+
+autoTranslate res/values/strings.xml app_name Instant Messenger
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
