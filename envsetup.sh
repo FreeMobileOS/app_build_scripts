@@ -1,9 +1,70 @@
 #!/bin/sh
 # script to setup environment for app build
 
+export FMO_SCRIPT_DIR="$(realpath $(dirname $(echo ${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]})))"
+
 function warn_msg()
 {
 	echo "$@" 1>&2;
+}
+
+# Translate text...
+# Usage:
+# translate LANGCODE text
+#	LANGCODE: language code of target language
+#	text: English text
+#
+# Return:
+#	Translated text in language specified by LANGCODE
+#
+# Example:
+#	translate de Linux forever
+# (should return Linux für immer)
+function translate()
+{
+	local lng="$1"
+	if echo $lng |grep -q '^..[_-]r..$'; then
+		# Android-ish LANG-rREGION isn't recognized by translate
+		# but standard-ish LANG-REGION is...
+		lng=$(echo $lng |cut -b1-2)-$(echo $lng |cut -b5-6)
+	fi
+	shift
+	local X="$@|$lng|"
+	if grep -q "^$X" $FMO_SCRIPT_DIR/translation-overrides; then
+		echo -n $(grep "^$X" $FMO_SCRIPT_DIR/translation-overrides |cut -d'|' -f3-)
+	else
+		wget -qO - -U "Mozilla/5.0" "http://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lng}&dt=t&q=$(echo $@ |sed -e 's, ,+,g')" |cut -d'"' -f2
+	fi
+}
+
+# Automatically translate text in Android resource files
+# Usage:
+# autoTranslate file ID text
+#	file: XML resource file
+#	ID: resource identifier
+#	text: Text
+#
+# Example:
+#	autoTranslate forecastie/app/src/main/res/values/strings.xml app_name Weather
+# (should change the name of the forecastie app to "Weather", with
+# appropriate translations to any langauge forecastie provides
+# translations for)
+function autoTranslate()
+{
+	local F="$1"
+	shift
+	local ID="$1"
+	shift
+	# Replace string in untranslated file...
+	sed -i -E "s|<string name=\"$ID\">.*</string>|<string name=\"$ID\">$@</string>|" $F
+	local BASE=$(dirname $(dirname $F))
+	local FN=$(basename $F)
+	for i in ${BASE}/values-*/$FN; do
+		[ -e "$i" ] || continue
+		local LANGCODE=`echo $i |sed -e "s,${BASE}/values-,,;s,/.*,,"`
+		sed -i -E "s|<string name=\"$ID\">.*</string>|<string name=\"$ID\">$(translate $LANGCODE $@)</string>|" $i
+		echo $LANGCODE: $(translate $LANGCODE $@)
+	done
 }
 
 function update_parameter()
