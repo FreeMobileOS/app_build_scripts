@@ -1,4 +1,7 @@
 #!/bin/sh
+MYDIR="$(dirname $(realpath $0))"
+. ${MYDIR}/envsetup.sh
+
 if [ ! -d omim ]; then
 	git clone --depth 1 -b fmo-release-80 git@github.com:FreeMobileOS/omim
 	cd omim
@@ -15,6 +18,9 @@ sed -i -e 's,#define DEFAULT_URLS_JSON.*,#define DEFAULT_URLS_JSON \"[\\"http://
 sed -i -e 's|cppFlags .*|&, "-DANDROID64"|' android/build.gradle
 sed -i -e 's|cFlags .*|&, "-DANDROID64"|' android/build.gradle
 cd android
+
+# Use generic name
+autoTranslate res/values/strings.xml app_name Maps
 
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then

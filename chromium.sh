@@ -93,11 +93,10 @@ for lng in am ar bg ca cs da de el es es-rUS fa fi fr hi hr hu in it iw ja ko lt
 
 	echo $lng: $INTERNET_BOOKMARKS
 
-	set -x
 	sed -i -e "s,<string name=\"app_name\" translatable=\"false\">Chromium</string>,<string name=\"app_name\">$INTERNET</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
 	sed -i -e "s,<string name=\"bookmark_widget_title\" translatable=\"false\">Chromium bookmarks</string>,<string name=\"bookmark_widget_title\">$INTERNET_BOOKMARKS</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
 	sed -i -e "s,<string name=\"search_widget_title\" translatable=\"false\">Chromium search</string>,<string name=\"search_widget_title\">$INTERNET_SEARCH</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
-	set +x
+	sed -i -e "s,',\\\\',g" chrome/android/java/res_chromium/values-$lng/channel_constants.xml #'"
 done
 sed -i -e 's,<string name="app_name" translatable="false">Chromium</string>,<string name="app_name">Internet</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
 sed -i -e 's,<string name="bookmark_widget_title" translatable="false">Chromium bookmarks</string>,<string name="bookmark_widget_title">Internet Bookmarks</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
