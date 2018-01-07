@@ -1,18 +1,23 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION="1.6.4.1"
+[ -z "$VERSION" ] && VERSION="1.6.4.2"
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d AntennaPod ] || git clone --depth 1 -b ${VERSION} git@github.com:FreeMobileOS/AntennaPod
+[ -d AntennaPod ] || git clone --depth 1 -b ${VERSION} git@github.com:AntennaPod/AntennaPod
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
 fi
 
 cd AntennaPod
+
+# Use a generic name...
+sed -i -e 's,name="app_name" translate="false",name="app_name",g' core/src/main/res/values/strings.xml app/src/main/res/values/strings.xml
+autoTranslate core/src/main/res/values/strings.xml app_name Podcasts
+autoTranslate app/src/main/res/values/strings.xml app_name Podcasts
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
