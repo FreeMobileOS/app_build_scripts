@@ -1,6 +1,6 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=build/outputs/apk/kdeconnect-android-release.apk
+OUTAPK=build/outputs/apk/release/kdeconnect-android-release.apk
 MODULE=kdeconnect-android
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
