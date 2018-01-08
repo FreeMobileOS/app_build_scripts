@@ -39,7 +39,7 @@ android {
 EOF
 	fi
 	./gradlew clean assembleRelease
-	cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
+	cp -f $OUTAPK $PRODUCT_OUT_PATH/release/$MODULE.apk
 else
     echo "WARNING: Debug build is not supported"
 fi
