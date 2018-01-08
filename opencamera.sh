@@ -4,7 +4,7 @@ OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=opencamera
 . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION="v1.42"
+[ -z "$VERSION" ] && VERSION="v1.42.1"
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"

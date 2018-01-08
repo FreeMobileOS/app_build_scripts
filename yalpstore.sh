@@ -1,13 +1,14 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=app/build/outputs/apk/app-release.apk
+OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=yalpstore
+[ -z "$VERSION" ] && VERSION=0.33
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:yeriomin/YalpStore.git $MODULE --branch 0.28 --single-branch
+[ -d $MODULE ] || git clone git@github.com:yeriomin/YalpStore.git $MODULE --branch ${VERSION} --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
