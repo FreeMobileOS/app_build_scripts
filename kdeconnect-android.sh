@@ -2,12 +2,12 @@
 MYDIR="$(dirname $(realpath $0))"
 OUTAPK=build/outputs/apk/release/kdeconnect-android-release.apk
 MODULE=kdeconnect-android
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/kdeconnect-android.git $MODULE --branch fmo-v1.6.6 --single-branch
+[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/kdeconnect-android.git $MODULE --branch fmo-v1.7.1 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
