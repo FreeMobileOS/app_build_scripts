@@ -6,11 +6,13 @@ GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build
 # GN_ARGS='target_os="android" target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="ChromeOS" enable_hevc_demuxing=true'
 # to get more codecs supported... But this causes ffmpeg build breakages without patching the code
 # 
-# Monochrome is supposed to be a combined Chromium and Webview APK. Current tests show it not
-# actually replacing the system webview though.
-[ -z "$USE_MONOCHROME" ] && USE_MONOCHROME=false
+# Monochrome is a combined Chromium and Webview APK.
+# Requires patched AOSP -- patches have landed in FMO git.
+# Let's keep the option to turn Monochrome off just in
+# case we want to build an APK for other AOSP forks though.
+[ -z "$USE_MONOCHROME" ] && USE_MONOCHROME=true
 # Available channels: head, canary, dev, beta, stable
-[ -z "$CHANNEL" ] && CHANNEL=head
+[ -z "$CHANNEL" ] && CHANNEL=dev
 
 MYDIR="$(dirname $(realpath $0))"
 cd $MYDIR
