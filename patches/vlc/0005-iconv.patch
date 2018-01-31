@@ -1,0 +1,12 @@
+--- vlc-android/vlc/contrib/src/libdsm/rules.mak.omv~	2018-01-31 22:13:41.510703067 +0100
++++ vlc-android/vlc/contrib/src/libdsm/rules.mak	2018-01-31 22:18:20.194360934 +0100
+@@ -20,6 +20,9 @@ endif
+ 
+ libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
+ 	$(UNPACK)
++	sed -i -e '/assert.h/i#define iconv libiconv' libdsm-$(LIBDSM_VERSION)/src/smb_utils.c
++	sed -i -e '/assert.h/i#define iconv_open libiconv_open' libdsm-$(LIBDSM_VERSION)/src/smb_utils.c
++	sed -i -e '/assert.h/i#define iconv_close libiconv_close' libdsm-$(LIBDSM_VERSION)/src/smb_utils.c
+ 	$(MOVE)
+ 
+ DEPS_libdsm = libtasn1 iconv

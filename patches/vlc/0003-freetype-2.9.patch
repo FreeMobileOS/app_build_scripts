@@ -1,0 +1,32 @@
+--- vlc-android/vlc/contrib/src/freetype2/rules.mak.omv~	2018-01-31 16:13:55.662093171 +0100
++++ vlc-android/vlc/contrib/src/freetype2/rules.mak	2018-01-31 16:15:30.825203301 +0100
+@@ -1,19 +1,19 @@
+ # freetype2
+ 
+-FREETYPE2_VERSION := 2.8.1
+-FREETYPE2_URL := $(SF)/freetype/freetype2/$(FREETYPE2_VERSION)/freetype-$(FREETYPE2_VERSION).tar.gz
++FREETYPE2_VERSION := 2.9
++FREETYPE2_URL := https://download.savannah.gnu.org/releases/freetype/freetype-$(FREETYPE2_VERSION).tar.bz2
+ 
+ PKGS += freetype2
+ ifeq ($(call need_pkg,"freetype2"),)
+ PKGS_FOUND += freetype2
+ endif
+ 
+-$(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.gz:
++$(TARBALLS)/freetype-$(FREETYPE2_VERSION).tar.bz2:
+ 	$(call download_pkg,$(FREETYPE2_URL),freetype2)
+ 
+-.sum-freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
++.sum-freetype2: freetype-$(FREETYPE2_VERSION).tar.bz2
+ 
+-freetype: freetype-$(FREETYPE2_VERSION).tar.gz .sum-freetype2
++freetype: freetype-$(FREETYPE2_VERSION).tar.bz2 .sum-freetype2
+ 	$(UNPACK)
+ 	$(call pkg_static, "builds/unix/freetype2.in")
+ 	$(MOVE)
+--- vlc-android/vlc/contrib/src/freetype2/SHA512SUMS.omv~	2018-01-31 16:15:39.518213294 +0100
++++ vlc-android/vlc/contrib/src/freetype2/SHA512SUMS	2018-01-31 16:16:00.392237248 +0100
+@@ -1 +1 @@
+-90d5016ccce1aff3dd46cd457cbed1ad736fbf6aafc12dad58164b983e623c418d7875cd33a7ce20a0d6e93c6d9d4062c06924d97197f53c43b36a1968a4da8c  freetype-2.8.1.tar.gz
++28465f3453baf9a187529432118389de8f1b85273c9fb787d2c8f0feee8ab64b387ddd936b4e67ec58dcf71e33884e7e25f01169b737824221ab143839a9161a  freetype-2.9.tar.bz2

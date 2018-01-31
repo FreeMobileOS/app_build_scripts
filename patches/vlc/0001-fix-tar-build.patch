@@ -1,0 +1,22 @@
+--- vlc-android/vlc/extras/tools/tools.mak.0001~	2018-01-31 14:18:59.124784275 +0100
++++ vlc-android/vlc/extras/tools/tools.mak	2018-01-31 14:20:34.076844218 +0100
+@@ -110,7 +110,7 @@ tar: tar-$(TAR_VERSION).tar.bz2
+ 	$(MOVE)
+ 
+ .tar: tar
+-	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
++	(cd $<; sed -i -e '/GL_WARN_ON_USE (gets/d' gnu/stdio.in.h; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+ 	touch $@
+ 
+ CLEAN_PKG += tar
+--- vlc-android/compile.sh.omv~	2018-01-31 15:49:19.073752940 +0100
++++ vlc-android/compile.sh	2018-01-31 15:49:33.821791351 +0100
+@@ -244,7 +244,7 @@ EOF
+     exit 1
+ fi
+ if [ "$RELEASE" = 1 ]; then
+-    git reset --hard ${TESTED_HASH}
++    git checkout ${TESTED_HASH}
+ fi
+ cd ..
+ 

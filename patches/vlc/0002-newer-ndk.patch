@@ -1,0 +1,72 @@
+--- vlc-android/compile-libvlc.sh.omv~	2018-01-31 15:57:26.827765698 +0100
++++ vlc-android/compile-libvlc.sh	2018-01-31 15:57:59.559819916 +0100
+@@ -482,7 +482,7 @@ mkdir -p contrib/contrib-android-${TARGE
+ # don't use the dummy uchar.c
+ if [ ! -f contrib/${TARGET_TUPLE}/include/uchar.h ]; then
+     mkdir -p contrib/${TARGET_TUPLE}/include
+-    cp ${ANDROID_NDK}/platforms/android-24/arch-${PLATFORM_SHORT_ARCH}/usr/include/uchar.h \
++    cp ${ANDROID_NDK}/sysroot/usr/include/uchar.h \
+         contrib/${TARGET_TUPLE}/include/uchar.h
+ fi
+ 
+--- vlc-android/vlc/modules/audio_output/audiotrack.c.omv~	2018-01-31 16:41:22.865320971 +0100
++++ vlc-android/vlc/modules/audio_output/audiotrack.c	2018-01-31 16:41:29.581329354 +0100
+@@ -29,6 +29,7 @@
+ #include <jni.h>
+ #include <dlfcn.h>
+ #include <stdbool.h>
++#include <errno.h>
+ 
+ #include <vlc_common.h>
+ #include <vlc_plugin.h>
+--- vlc-android/vlc/modules/codec/omxil/omxil.c.omv~	2018-01-31 16:42:01.529369139 +0100
++++ vlc-android/vlc/modules/codec/omxil/omxil.c	2018-01-31 16:42:08.421377701 +0100
+@@ -29,6 +29,7 @@
+ #endif
+ 
+ #include <limits.h>
++#include <errno.h>
+ 
+ #include <vlc_common.h>
+ #include <vlc_plugin.h>
+--- vlc-android/vlc/src/android/specific.c.omv~	2018-01-31 16:40:42.985271038 +0100
++++ vlc-android/vlc/src/android/specific.c	2018-01-31 16:40:49.900279715 +0100
+@@ -23,6 +23,7 @@
+ #endif
+ 
+ #include <assert.h>
++#include <errno.h>
+ 
+ #include <vlc_common.h>
+ #include <vlc_network.h>
+--- vlc-android/vlc/modules/video_output/opengl/converter_android.c.omv~	2018-01-31 18:02:26.282457476 +0100
++++ vlc-android/vlc/modules/video_output/opengl/converter_android.c	2018-01-31 18:04:05.285560215 +0100
+@@ -26,6 +26,7 @@
+ # error this file must be built from android
+ #endif
+ 
++#include <GLES2/gl2.h>
+ #include <GLES2/gl2ext.h>
+ #include "converter.h"
+ #include "../android/display.h"
+--- vlc-android/libvlc/jni/Android.mk.omv~	2018-01-31 18:14:36.067153508 +0100
++++ vlc-android/libvlc/jni/Android.mk	2018-01-31 18:14:45.319172906 +0100
+@@ -14,7 +14,6 @@ LOCAL_SRC_FILES += std_logger.c
+ LOCAL_SRC_FILES += dummy.cpp
+ LOCAL_C_INCLUDES := $(VLC_SRC_DIR)/include $(MEDIALIBRARY_JNI_DIR) $(LOCAL_PATH)/loader
+ 
+-LOCAL_CFLAGS := -std=c11
+ include $(BUILD_STATIC_LIBRARY)
+ 
+ # libvlc dynamic library
+--- vlc-android/libvlc/jni/thumbnailer.c.omv~	2018-01-31 18:36:24.631281578 +0100
++++ vlc-android/libvlc/jni/thumbnailer.c	2018-01-31 18:37:20.802360886 +0100
+@@ -18,6 +18,8 @@
+  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+  *****************************************************************************/
+ 
++#include <stdlib.h>
++#include <string.h>
+ #include <assert.h>
+ #include <jni.h>
+ #include <vlc/vlc.h>
