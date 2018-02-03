@@ -2,7 +2,7 @@
 MYDIR="$(dirname $(realpath $0))"
 OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=yalpstore
-[ -z "$VERSION" ] && VERSION=0.33
+[ -z "$VERSION" ] && VERSION=0.35
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
