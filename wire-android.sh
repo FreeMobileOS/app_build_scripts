@@ -1,6 +1,6 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-[ -z "$VERSION" ] && VERSION=2.42.364
+[ -z "$VERSION" ] && VERSION=3.5.888
 MODULE=wire-android
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR

@@ -5,6 +5,7 @@ MYDIR="$(dirname $(realpath $0))"
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
+# Currently based on 5.403 tag
 [ -d k9mail ] || git clone git@github.com:FreeMobileOS/k9mail --branch fmo-8.0.0 --single-branch 
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
