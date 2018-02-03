@@ -2,7 +2,7 @@
 MYDIR="$(dirname $(realpath $0))"
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=3.4.4
+[ -z "$VERSION" ] && VERSION=3.4.5
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -13,6 +13,7 @@ if [ -d secret-keys ]; then
 fi
 
 cd PassAndroid
+autoTranslate android/src/main/res/values/strings.xml app_name Wallet
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
