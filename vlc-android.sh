@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=2.9.0
+VERSION=3.0.x
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
@@ -41,7 +41,7 @@ echo Using SDK $ANDROID_SDK
 echo Using NDK $ANDROID_NDK
 git clone https://git.videolan.org/git/vlc/vlc-3.0.git vlc
 cd vlc
-git checkout -b vlc-android $(cat compile.sh |grep ^TESTED_HASH |cut -d= -f2)
+git checkout -b vlc-android $(cat ../compile.sh |grep ^TESTED_HASH |cut -d= -f2)
 cd ..
 
 for i in ${MYDIR}/patches/vlc/*.patch; do
@@ -72,10 +72,10 @@ android {
 EOF
 	fi
 	sh compile.sh -a arm64-v8a --release 2>&1 |tee ${MYDIR}/vlc-build.log
-	cp -f vlc-android/build/outputs/apk/vanillaARMv8/release/VLC-Android-${VERSION}-ARMv8.apk $PRODUCT_OUT_PATH/vlc.apk
+	cp -f vlc-android/build/outputs/apk/vanillaARMv8/release/VLC-Android-*-ARMv8.apk $PRODUCT_OUT_PATH/vlc.apk
 else
 	sh compile.sh -a arm64-v8a
-	cp -f vlc-android/build/outputs/apk/vanillaARMv8/*/VLC-Android-${VERSION}-ARMv8.apk $PRODUCT_OUT_PATH/vlc-debug.apk
+	cp -f vlc-android/build/outputs/apk/vanillaARMv8/*/VLC-Android-*-ARMv8.apk $PRODUCT_OUT_PATH/vlc-debug.apk
 fi
 
 # VLC builds start a gradle daemon that needs to be killed
