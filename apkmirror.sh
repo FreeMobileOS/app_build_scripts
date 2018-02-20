@@ -1,6 +1,6 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=build/outputs/apk/app-release.apk
+OUTAPK=build/outputs/apk/release/app-release.apk
 MODULE=apkmirror
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
@@ -39,7 +39,7 @@ android {
 EOF
 	fi
 	./gradlew clean assembleRelease
-	cp -f $OUTAPK $PRODUCT_OUT_PATH/release/$MODULE.apk
+	cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
     echo "WARNING: Debug build is not supported"
 fi

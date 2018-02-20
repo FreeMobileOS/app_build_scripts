@@ -7,7 +7,7 @@ MODULE=fdroidclient
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone https://gitlab.com/fdroid/fdroidclient.git --branch 1.1-alpha1 --single-branch
+[ -d $MODULE ] || git clone https://gitlab.com/fdroid/fdroidclient.git --branch 1.1-alpha2 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys

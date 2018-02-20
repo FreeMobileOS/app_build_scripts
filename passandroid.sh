@@ -17,6 +17,24 @@ autoTranslate android/src/main/res/values/strings.xml app_name Wallet
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
+
+	cat >>android/build.gradle <<EOF
+android {
+	signingConfigs {
+		release {
+			storeFile file("$CERTS/aosp/fmo.jks")
+			storePassword "$P"
+			keyAlias "apps"
+			keyPassword "$P"
+		}
+	}
+	buildTypes {
+		release {
+			signingConfig signingConfigs.release
+		}
+	}
+}
+EOF
 	cat >signing.properties <<EOF
 STORE_FILE=$CERTS/aosp/fmo.jks
 STORE_PASSWORD=$P
@@ -24,8 +42,8 @@ KEY_ALIAS=apps
 KEY_PASSWORD=$P
 EOF
 	./gradlew assembleRelease
-	cp -f android/build/outputs/apk/PassAndroid-*-noMaps-noAnalytics-forFDroid-release-unsigned.apk $PRODUCT_OUT_PATH/PassAndroid.apk
+	cp -f android/build/outputs/apk/PassAndroid-*-noMaps-noAnalytics-forFDroid-release.apk $PRODUCT_OUT_PATH/PassAndroid.apk
 else
 	./gradlew assembleDebug
-	cp -f android/build/outputs/apk/PassAndroid-*-noMaps-noAnalytics-forFDroid-release-unsigned.apk $PRODUCT_OUT_PATH/PassAndroid.apk
+	cp -f android/build/outputs/apk/PassAndroid-*-noMaps-noAnalytics-forFDroid-release.apk $PRODUCT_OUT_PATH/PassAndroid.apk
 fi

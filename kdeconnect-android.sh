@@ -7,7 +7,7 @@ MODULE=kdeconnect-android
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/kdeconnect-android.git $MODULE --branch fmo-v1.7.1 --single-branch
+[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/kdeconnect-android.git $MODULE --branch fmo-v1.7.2 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys

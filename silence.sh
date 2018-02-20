@@ -4,7 +4,7 @@ OUTAPK=build/outputs/apk/silence-release.apk
 MODULE=silence
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v0.16.7-unstable
+[ -z "$VERSION" ] && VERSION=v0.16.8-unstable
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"

@@ -7,6 +7,6 @@
 +	sed -i -e '/assert.h/i#define iconv libiconv' libdsm-$(LIBDSM_VERSION)/src/smb_utils.c
 +	sed -i -e '/assert.h/i#define iconv_open libiconv_open' libdsm-$(LIBDSM_VERSION)/src/smb_utils.c
 +	sed -i -e '/assert.h/i#define iconv_close libiconv_close' libdsm-$(LIBDSM_VERSION)/src/smb_utils.c
+ 	$(APPLY) $(SRC)/libdsm/0001-netbios-use-time-instead-of-clock_gettime.patch
  	$(MOVE)
  
- DEPS_libdsm = libtasn1 iconv

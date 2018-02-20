@@ -3,7 +3,7 @@ MYDIR="$(dirname $(realpath $0))"
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
-VERSION=4.16.3
+VERSION=4.16.4
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"

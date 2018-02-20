@@ -2,7 +2,7 @@
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION="1.6.4.2"
+[ -z "$VERSION" ] && VERSION="1.6.4.5"
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"

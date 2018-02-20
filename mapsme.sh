@@ -3,7 +3,7 @@ MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
 
 if [ ! -d omim ]; then
-	git clone --depth 1 -b fmo-release-806 git@github.com:FreeMobileOS/omim
+	git clone --depth 1 -b fmo-release-81 git@github.com:FreeMobileOS/omim
 	cd omim
 	git submodule init
 	git submodule update
