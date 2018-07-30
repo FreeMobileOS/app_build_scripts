@@ -3,7 +3,7 @@ MYDIR="$(dirname $(realpath $0))"
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
-VERSION=4.19.3
+VERSION=4.24.5
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -19,6 +19,9 @@ cd Signal-Android
 sed -i -e 's,PlayServicesUtil.getPlayServicesStatus(this);,PlayServicesStatus.MISSING;,' src/org/thoughtcrime/securesms/RegistrationActivity.java
 
 autoTranslate res/values/strings.xml app_name Instant Messenger
+
+# add applicationId to resolve conflicts with playstore version.
+sed -i '/'$VERSION'/a \\tapplicationId "com.fmo.signal"' build.gradle
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
