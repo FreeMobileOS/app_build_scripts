@@ -24,8 +24,9 @@ JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
 
 touch play-services-core/user.gradle
 rm -Rf $gmscore_build
-echo "sdk.dir=$ANDROID_SDK_HOME" > $gmscore_root/local.properties
-git submodule update --recursive --init
+echo "sdk.dir=$ANDROID_SDK_PATH" > $gmscore_root/local.properties
+echo "sdk-location=$ANDROID_SDK_PATH" >> local.properties
+git submodule update --recursive --init ;  echo "exit code: ${?}"
 
 if [ -n "$CERTS" ]; then
         P="$(cat $CERTS/aosp/password)"
@@ -49,8 +50,8 @@ android {
 EOF
         fi
         echo "gmsroot is:$gmscore_root"
-        cd $gmscore_root/$gmscore_dir
-        ../gradlew assembleRelease
+        cd $gmscore_root
+        ./gradlew assembleRelease
         cd $MODULE
         cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
