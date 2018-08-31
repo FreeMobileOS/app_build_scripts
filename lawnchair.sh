@@ -4,7 +4,7 @@ OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=Lawnchair
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=fmo-1.1.0.1872
+[ -z "$VERSION" ] && VERSION=fmo-1.2.0.1884
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
