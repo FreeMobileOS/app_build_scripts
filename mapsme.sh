@@ -4,7 +4,7 @@ OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=omim
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=fmo-1.1.0.1742
+[ -z "$VERSION" ] && VERSION=fmo-pykmlib-0.0.2
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
