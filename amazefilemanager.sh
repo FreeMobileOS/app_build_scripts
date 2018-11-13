@@ -1,10 +1,10 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=app/build/outputs/apk/app-fdroid-release.apk
+OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=amazefilemanager
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v.3.2.1
+[ -z "$VERSION" ] && VERSION=v.3.3.0-rc13
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
