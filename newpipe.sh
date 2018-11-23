@@ -4,7 +4,7 @@ OUTAPK=./app/build/outputs/apk/release/app-release.apk
 MODULE=newpipe
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v0.13.3
+[ -z "$VERSION" ] && VERSION=master
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
