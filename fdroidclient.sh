@@ -16,6 +16,10 @@ fi
 cd $MODULE
 echo "LOG>>..$MODULE"
 
+# we are packaging fdroidclient as system app, so allow to download icon on data connection
+# user can change the settings later on from app
+sed -i -e 's,"defaultOverData">1,"defaultOverData">2,' app/src/main/res/values/donottranslate.xml
+
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
 	if ! grep -q fmo.jks app/build.gradle; then
