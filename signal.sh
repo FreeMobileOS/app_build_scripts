@@ -3,7 +3,7 @@ MYDIR="$(dirname $(realpath $0))"
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
-VERSION=4.31.6
+VERSION=4.32.8
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -20,6 +20,9 @@ sed -i -e 's,PlayServicesUtil.getPlayServicesStatus(this);,PlayServicesStatus.MI
 
 # let's fix expiry period
 sed -i -e 's,return 90 - age;,return 390 - age;,' src/org/thoughtcrime/securesms/util/Util.java
+
+# let's do not show update notification
+sed -i -e '/UpdateApkRefreshListener.schedule/d' src/org/thoughtcrime/securesms/ApplicationContext.java
 
 # fix sign build. We are using our signature
 sed -i -e '/task.finalizedBy signProductionPlayRelease/d' build.gradle
