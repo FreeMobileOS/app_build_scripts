@@ -7,7 +7,7 @@ MODULE=k9mail
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/k9mail --branch fmo-8.0.0 --single-branch
+[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/k9mail --branch fmo-9 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
         CERTS="$(pwd)"/secret-keys
