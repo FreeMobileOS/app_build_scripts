@@ -1,36 +1,47 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-. ${MYDIR}/envsetup.sh
+OUTAPK=./k9mail/build/outputs/apk/release/k9mail-release.apk
+MODULE=k9mail
+[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-# Currently based on 5.403 tag
-[ -d k9mail ] || git clone git@github.com:FreeMobileOS/k9mail --branch fmo-8.0.0 --single-branch 
+[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/k9mail --branch fmo-8.0.0 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
-	CERTS="$(pwd)"/secret-keys
-    P="$(cat $CERTS/aosp/password)"
+        CERTS="$(pwd)"/secret-keys
 fi
 
-cd k9mail
-
+cd $MODULE
 # Use generic names
-autoTranslate k9mail/src/main/res/values/strings.xml app_name E-Mail
-autoTranslate k9mail/src/main/res/values/strings.xml shortcuts_title "E-Mail Accounts"
-autoTranslate k9mail/src/main/res/values/strings.xml unread_widget_label "Unread email"
+sed -i -e 's,app_name">K-9 Mail,app_name">E-Mail,' k9mail/src/main/res/values/strings.xml
+sed -i -e 's,shortcuts_title">K-9 Accounts,shortcuts_title">E-Mail Accounts,' k9mail/src/main/res/values/strings.xml
+sed -i -e 's,unread_widget_label">K-9 Unread,unread_widget_label">Unread email,' k9mail/src/main/res/values/strings.xml
 
-echo "Building k9mail.."
-./gradlew clean assembleRelease
-
-echo "zipalign k9mail.."
-# Alternatively, instead of adding to build.gradle above:
-ZIPALIGN_CMD_PATH=$(find $ANDROID_HOME -name zipalign | head -n 1)
-$ZIPALIGN_CMD_PATH -v -p 8 k9mail/build/outputs/apk/k9mail-release-unsigned.apk k9mail/build/outputs/apk/k9mail-release-unsigned-aligned.apk
-
-echo "sigining k9mail..:$CERTS"
-APKSIGN_CMD_PATH=$(find $ANDROID_HOME -name apksigner | head -n 1)
-echo "APKSINGN PATH.:$APKSIGN_CMD_PATH"
-$APKSIGN_CMD_PATH sign --ks ${CERTS}/aosp/fmo.jks --ks-pass file:$CERTS/aosp/password --out k9mail/build/outputs/apk/k9mail.apk k9mail/build/outputs/apk/k9mail-release-unsigned-aligned.apk
-
-cp -f k9mail/build/outputs/apk/k9mail.apk $PRODUCT_OUT_PATH/k9mail.apk
+if [ -n "$CERTS" ]; then
+        P="$(cat $CERTS/aosp/password)"
+        if ! grep -q fmo.jks k9mail/build.gradle; then
+                cat >>k9mail/build.gradle <<EOF
+android {
+        signingConfigs {
+                release {
+                        storeFile file("$CERTS/aosp/fmo.jks")
+                        storePassword "$P"
+                        keyAlias "apps"
+                        keyPassword "$P"
+                }
+        }
+        buildTypes {
+                release {
+                        signingConfig signingConfigs.release
+                }
+        }
+}
+EOF
+        fi
+        ./gradlew clean assembleRelease
+        cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
+else
+    echo "Warning: Debug build is not supported"
+fi
