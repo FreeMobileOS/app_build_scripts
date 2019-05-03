@@ -1,10 +1,29 @@
 #!/bin/sh
+
+# utility function to add signature file
+add_keystore()
+{
+	p_gradle=$1
+	cp $CERTS/aosp/fmo.jks ./fmo.jks
+	if [ -n "$CERTS" ]; then
+		P="$(cat $CERTS/aosp/password)"
+			cat >>$p_gradle <<EOF
+ext {
+    spropStorePassword= "$P"
+    spropKeyPassword= "$P"
+    spropKeyAlias= "apps"
+    spropStoreFile= "$(pwd)/fmo.jks"
+}
+EOF
+	fi
+}
+
 MYDIR="$(dirname $(realpath $0))"
 OUTAPK=app/build/outputs/apk/release/app-release.apk
 MODULE=omim
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=fmo-pykmlib-0.0.2
+[ -z "$VERSION" ] && VERSION=fmo-py-modules-0.2.11
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -33,26 +52,8 @@ cd android
 autoTranslate res/values/strings.xml app_name Maps
 
 if [ -n "$CERTS" ]; then
-	P="$(cat $CERTS/aosp/password)"
-	if ! grep -q fmo.jks app/build.gradle; then
-		cat >>app/build.gradle <<EOF
-android {
-	signingConfigs {
-		release {
-			storeFile file("$CERTS/aosp/fmo.jks")
-			storePassword "$P"
-			keyAlias "apps"
-			keyPassword "$P"
-		}
-	}
-	buildTypes {
-		release {
-			signingConfig signingConfigs.release
-		}
-	}
-}
-EOF
-	fi
+    rm secure.properties
+    add_keystore "secure.properties" 
 fi
 
 ./gradlew -Parm64=1 -Darm64=1 assembleWebRelease
