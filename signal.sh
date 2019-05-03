@@ -3,7 +3,7 @@ MYDIR="$(dirname $(realpath $0))"
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
-VERSION=4.34.8
+VERSION=4.37.1
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -58,7 +58,7 @@ EOF
 	fi
     echo "release build"
 	./gradlew assembleRelease
-	cp -f build/outputs/apk/website/release/Signal-website-release-$VERSION.apk $PRODUCT_OUT_PATH/signal.apk
+	cp -f build/outputs/apk/website/release/Signal-website-armeabi-v7a-release-$VERSION.apk $PRODUCT_OUT_PATH/signal.apk
 else
     echo "debug build"
 	./gradlew assembleDebug
