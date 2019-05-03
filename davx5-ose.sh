@@ -32,7 +32,7 @@ OUTAPK=app/build/outputs/apk/standard/release/app-standard-release.apk
 MODULE=davx5-ose
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v2.2.2-ose
+[ -z "$VERSION" ] && VERSION=v2.4.0.1-ose
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
