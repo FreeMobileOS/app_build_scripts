@@ -1,8 +1,8 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=app/build/outputs/apk/release/app-release.apk
+OUTAPK=./app/build/outputs/apk/legacy/release/app-legacy-release.apk
 MODULE=yalpstore
-[ -z "$VERSION" ] && VERSION=0.35
+[ -z "$VERSION" ] && VERSION=0.45
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
