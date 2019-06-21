@@ -52,7 +52,6 @@ EOF
         echo "gmsroot is:$gmscore_root"
         cd $gmscore_root
         ./gradlew assembleRelease
-        cd $MODULE
         cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
     echo "Warning: Debug build is not supported"
