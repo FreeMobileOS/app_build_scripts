@@ -1,7 +1,7 @@
 #!/bin/sh
 # For a list of current Android compatible versions, see
 # http://omahaproxy.appspot.com/
-GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true'
+GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true enable_feed_in_chrome=false'
 # FIXME should probably switch to
 # GN_ARGS='target_os="android" target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="ChromeOS" enable_hevc_demuxing=true'
 # to get more codecs supported... But this causes ffmpeg build breakages without patching the code
@@ -64,8 +64,8 @@ fi
 # We should also outnumber our own previous builds, so let's put a date code in there.
 # picking 379828897 as a base because it's sufficiently larger than 303012550 and it
 # will give our first build, done on 2017/11/03, a nice round number.
-VERCODE=$((379828897+$(date +%Y%m%d)))
-find . -name AndroidManifest.xml |xargs sed -i -e "s,android:versionCode=\"1\",android:versionCode=\"$VERCODE\",g"
+#VERCODE=$((379828897+$(date +%Y%m%d)))
+#find . -name AndroidManifest.xml |xargs sed -i -e "s,android:versionCode=\"1\",android:versionCode=\"$VERCODE\",g"
 
 # Let's not expect a "stupid user" knows what Chromium is...
 # And a more generic name should be translatable.
@@ -73,7 +73,7 @@ find . -name AndroidManifest.xml |xargs sed -i -e "s,android:versionCode=\"1\",a
 # lint throws a tantrum on any strings that aren't translated
 # into every language, so let's do our best...
 #
-for lng in am ar bg ca cs da de el es es-rUS fa fi fr hi hr hu in it iw ja ko lt lv nb nl pl pt-rBR pt-rPT ro ru sk sl sr sv sw th tl tr uk vi zh-rCN zh-rTW; do
+for lng in am ar bg ca cs da de el en es es-rUS fa fi fr hi hr hu in it iw ja ko lt lv nb nl pl pt-rBR pt-rPT ro ru sk sl sr sv sw th tl tr uk vi zh-rCN zh-rTW ml mr ms et bn kn ta gu te; do
 	rm -rf chrome/android/java/res_chromium/values-$lng
 	cp -a chrome/android/java/res_chromium/values chrome/android/java/res_chromium/values-$lng
 	case $lng in
