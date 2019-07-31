@@ -1,11 +1,14 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-. ${MYDIR}/envsetup.sh
+OUTAPK=./app/build/outputs/apk/release/app-release.apk
+MODULE=forecastie
+[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
+[ -z "$VERSION" ] && VERSION=fmo-v1.10.4
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d forecastie ] || git clone --depth 1 git@github.com:FreeMobileOS/forecastie
+[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/forecastie.git $MODULE --branch $VERSION --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
@@ -16,39 +19,34 @@ if [ -d secret-keys ]; then
 	sed -i -e "s,3e29e62e2ddf6dd3d2ebd28aed069215,$KEY," forecastie/app/src/main/res/values/keys.xml
 fi
 
-cd forecastie
+cd $MODULE
 
-# Use a generic name...
-autoTranslate app/src/main/res/values/strings.xml app_name Weather
+# change app name to weather
+sed -i -e 's,app_name">Forecastie,app_name">Weather,' app/src/main/res/values/strings.xml
 
 if [ -n "$CERTS" ]; then
-	P="$(cat $CERTS/aosp/password)"
-	if ! grep -q fmo.jks app/build.gradle; then
-		cat >>app/build.gradle <<EOF
+        P="$(cat $CERTS/aosp/password)"
+        if ! grep -q fmo.jks app/build.gradle; then
+                cat >>app/build.gradle <<EOF
 android {
-	signingConfigs {
-		release {
-			storeFile file("$CERTS/aosp/fmo.jks")
-			storePassword "$P"
-			keyAlias "apps"
-			keyPassword "$P"
-		}
-	}
-	buildTypes {
-		release {
-			signingConfig signingConfigs.release
-		}
-	}
+        signingConfigs {
+                release {
+                        storeFile file("$CERTS/aosp/fmo.jks")
+                        storePassword "$P"
+                        keyAlias "apps"
+                        keyPassword "$P"
+                }
+        }
+        buildTypes {
+                release {
+                        signingConfig signingConfigs.release
+                }
+        }
 }
 EOF
-	fi
-	./gradlew assembleRelease
-	# Alternatively, instead of adding to build.gradle above:
-	#	$ANDROID_HOME/build-tools/26.0.0/zipalign -v -p 8 app/build/outputs/apk/app-release-unsigned.apk app/build/outputs/apk/app-release-unsigned-aligned.apk
-	#	$ANDROID_HOME/build-tools/25.0.3/apksigner sign --ks ${CERTS}/aosp/fmo.jks --out app/build/outputs/apk/forecastie.apk app/build/outputs/apk/app-release-unsigned-aligned.apk
-	#	cp -f app/build/outputs/apk/forecastie.apk $PRODUCT_OUT_PATH
-	cp -f app/build/outputs/apk/app-release.apk $PRODUCT_OUT_PATH/forecastie.apk
+        fi
+        ./gradlew clean assembleRelease
+        cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
-	./gradlew assembleDebug
-	cp -f app/build/outputs/apk/app-debug.apk $PRODUCT_OUT_PATH/forecastie.apk
+    echo "Warning: Debug build is not supported"
 fi
