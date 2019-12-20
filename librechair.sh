@@ -1,7 +1,7 @@
 #!/bin/sh
 ANDROID_BUILD_TOOLS=28.0.2
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=./build/outputs/apk/quickstepLawnchairL3riPlahWithWebView/release/librechair-quickstep-lawnchair-l3ri-plah-withWebView-release.apk
+OUTAPK=./build/outputs/apk/quickstepLawnchairL3riPlahWithWebView/optimized/librechair-quickstep-lawnchair-l3ri-plah-withWebView-optimized.apk
 MODULE=librechair
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
@@ -28,28 +28,9 @@ export TRAVIS_EVENT_TYPE="pull_request"
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
-	if ! grep -q fmo.jks build.gradle; then
-		cat >>build.gradle <<EOF
-android {
-	signingConfigs {
-		release {
-			storeFile file("$CERTS/aosp/fmo.jks")
-			storePassword "$P"
-			keyAlias "apps"
-			keyPassword "$P"
-		}
-	}
-	buildTypes {
-		release {
-			signingConfig signingConfigs.release
-		}
-	}
-}
-EOF
-	fi
     rm librechair-ci-signed-aligned.apk
     rm librechair-ci-signed.apk
-    ./gradlew clean assembleQuickstepLawnchairL3riPlahWithWebViewRelease
+    ./gradlew clean assembleQuickstepLawnchairL3riPlahWithWebView
     jarsigner -keystore $CERTS/aosp/fmo.jks $OUTAPK -storepass `cat $CERTS/aosp/password` -keypass `cat $CERTS/aosp/password` apps --signedjar librechair-ci-signed.apk
     ${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign -v 4 librechair-ci-signed.apk librechair-ci-signed-aligned.apk
 
