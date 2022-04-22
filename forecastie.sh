@@ -20,13 +20,15 @@ if [ -d secret-keys ]; then
 fi
 
 cd $MODULE
+wget https://github.com/martykan/forecastie/pull/673.patch
+patch -p1 -b -z .aosp12~ <673.patch
 
 # change app name to weather
 autoTranslate app/src/main/res/values/strings_main_graphs_map_about.xml app_name Weather
 
 # FIXME stop forcing old javac when gradle's copy of groovyjarjarasm starts
 # supporting something newer
-export JAVA_HOME=/usr/lib/jvm/java-14-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-16-openjdk
 
 if [ -n "$CERTS" ]; then
         P="$(cat $CERTS/aosp/password)"
