@@ -1,26 +1,22 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=./vector/build/outputs/apk/appfmo/release/vector-appfmo-release.apk
-MODULE=riot-android
+OUTAPK=vector/build/outputs/apk/fdroid/release/vector-fdroid-arm64-v8a-release.apk
+MODULE=element
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v0.8.23
+[ -z "$VERSION" ] && VERSION=v1.4.12
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:vector-im/riot-android.git $MODULE --branch $VERSION --single-branch
+[ -d $MODULE ] || git clone git@github.com:vector-im/element-android.git $MODULE --branch $VERSION --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
         CERTS="$(pwd)"/secret-keys
 fi
 
+export JAVA_HOME=/usr/lib/jvm/java-14-openjdk
+
 cd $MODULE
-
-# create FMO flavour
-mv vector/src/appfdroid vector/src/appfmo
-
-sed -i -e 's,FDroid,FMO,' vector/build.gradle
-sed -i -e 's,fdroid,fmo,' vector/build.gradle
 
 if [ -n "$CERTS" ]; then
         P="$(cat $CERTS/aosp/password)"
@@ -44,7 +40,7 @@ android {
 EOF
         fi
         ./gradlew clean
-        ./gradlew assembleAppfmoRelease
+        ./gradlew assembleFDroidRelease
         cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
     echo "Warning: Debug build is not supported"
