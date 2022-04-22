@@ -62,12 +62,17 @@ function autoTranslate()
 	for i in ${BASE}/values-*/$FN; do
 		[ -e "$i" ] || continue
 		local LANGCODE=`echo $i |sed -e "s,${BASE}/values-,,;s,/.*,,"`
-		if grep -q "<string name=\"$ID\">" $i; then
-			sed -i -E "s|<string name=\"$ID\">.*</string>|<string name=\"$ID\">$(translate $LANGCODE $@)</string>|" $i
-		else
-			sed -i -e "/<\/resources>/i	<string name=\"$ID\">$(translate $LANGCODE $@)<\/string>" $i
+		local TRANSLATION="$(translate $LANGCODE $@)"
+		[ -z "$TRANSLATION" ] && TRANSLATION="$@"
+		if echo $TRANSLATION |grep -q "'"; then
+			TRANSLATION="$(echo $TRANSLATION |sed -e "s,',\\\\\\\',g")"
 		fi
-		echo $LANGCODE: $(translate $LANGCODE $@)
+		if grep -q "<string name=\"$ID\">" $i; then
+			sed -i -E "s|<string name=\"$ID\">.*</string>|<string name=\"$ID\">$TRANSLATION</string>|" $i
+		else
+			sed -i -e "/<\/resources>/i	<string name=\"$ID\">$TRANSLATION<\/string>" $i
+		fi
+		echo $LANGCODE: $TRANSLATION
 	done
 }
 
