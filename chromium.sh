@@ -120,6 +120,9 @@ for lng in am ar bg ca cs da de el es es-rUS fa fi fr hi hr hu in it iw ja ko lt
 	sed -i -e "s,<string name=\"bookmark_widget_title\" translatable=\"false\">Chromium bookmarks</string>,<string name=\"bookmark_widget_title\">$INTERNET_BOOKMARKS</string>," chrome/android/java/res_chromium_base/values-$lng/channel_constants.xml
 	sed -i -e "s,<string name=\"search_widget_title\" translatable=\"false\">Chromium search</string>,<string name=\"search_widget_title\">$INTERNET_SEARCH</string>," chrome/android/java/res_chromium_base/values-$lng/channel_constants.xml
 	sed -i -e "s,',\\\\',g" chrome/android/java/res_chromium_base/values-$lng/channel_constants.xml #'"
+	if ! grep -q values-$lng/channel_constants.xml chrome/android/BUILD.gn; then
+		sed -i -e "/values\/channel_constants.xml/i    \"java/res_chromium_base/values-$lng/channel_constants.xml\"," chrome/android/BUILD.gn
+	fi
 done
 sed -i -e 's,<string name="app_name" translatable="false">Chromium</string>,<string name="app_name">Internet</string>,' chrome/android/java/res_chromium_base/values/channel_constants.xml
 sed -i -e 's,<string name="bookmark_widget_title" translatable="false">Chromium bookmarks</string>,<string name="bookmark_widget_title">Internet Bookmarks</string>,' chrome/android/java/res_chromium_base/values/channel_constants.xml

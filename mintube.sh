@@ -12,7 +12,12 @@ if [ -d secret-keys ]; then
 fi
 
 cd mintube
-chmod +x gradlew
+export JAVA_HOME=/usr/lib/jvm/java-14-openjdk
+# The included gradle wrapper is too old to even start,
+# but the gradle configs don't work for latest and greatest.
+# So let's go for something in between.
+rm -rf gradlew* gradle
+gradle wrapper --gradle-version=6.3
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
@@ -36,8 +41,8 @@ android {
 EOF
 	fi
 	./gradlew assembleRelease
-	cp -f app/build/outputs/apk/app-release.apk $PRODUCT_OUT_PATH/mintube.apk
+	cp -f app/build/outputs/apk/release/app-release.apk $PRODUCT_OUT_PATH/mintube.apk
 else
 	./gradlew assembleDebug
-	cp -f app/build/outputs/apk/app-debug.apk $PRODUCT_OUT_PATH/mintube-debug.apk
+	cp -f app/build/outputs/apk/debug/app-debug.apk $PRODUCT_OUT_PATH/mintube-debug.apk
 fi
