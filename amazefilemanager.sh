@@ -4,7 +4,7 @@ OUTAPK=./app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
 MODULE=amazefilemanager
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v3.3.2
+[ -z "$VERSION" ] && VERSION=v3.6.7
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -16,6 +16,10 @@ fi
 
 cd $MODULE
 echo "HACL>>..$MODULE"
+
+# FIXME Stupid, dumb Android SDK freaks out on any JDK not
+# 3 decades old
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0
 
 if [ -n "$CERTS" ]; then
         P="$(cat $CERTS/aosp/password)"
@@ -45,7 +49,7 @@ KEY_PASSWORD=$P
 EOF
 
         fi
-        ./gradlew clean assembleRelease
+        ./gradlew clean assembleFdroid
         cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
     echo "Warning: Debug build is not supported"
