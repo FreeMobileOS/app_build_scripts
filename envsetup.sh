@@ -267,7 +267,7 @@ done
 [ "$NEED_SDK" = "false" ] || set_sdkpath
 
 # set android source path
-[ "$NEED_SRC" = "false" ] || set_androidsrcpath
+[ "$NEED_SRC" = "true" ] && set_androidsrcpath
 
 if [ "$NEED_NDK" != "false" -a -z "$ANDROID_NDK_PATH" ] || [ "$NEED_SDK" != "false" -a -z "$ANDROID_SDK_PATH" ]; then
 	warn_msg "ANDROID_NDK and ANDROID_SDK is not set."
