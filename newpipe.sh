@@ -4,7 +4,7 @@ OUTAPK=./app/build/outputs/apk/release/app-release.apk
 MODULE=newpipe
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v0.16.1
+[ -z "$VERSION" ] && VERSION=v0.22.2
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -13,6 +13,8 @@ cd "$APP_ROOT_PATH"
 if [ -d secret-keys ]; then
         CERTS="$(pwd)"/secret-keys
 fi
+
+export JAVA_HOME=/usr/lib/jvm/java-14-openjdk
 
 cd $MODULE
 
