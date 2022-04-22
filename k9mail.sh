@@ -1,5 +1,6 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
+export NEED_SRC=false
 OUTAPK=./app/k9mail/build/outputs/apk/release/k9mail-release.apk
 MODULE=k9mail
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
@@ -7,17 +8,18 @@ MODULE=k9mail
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:FreeMobileOS/k9mail --branch 5.703 --single-branch
+[ -d $MODULE ] || git clone git@github.com:k9mail/k-9 --branch 6.000 --single-branch
 [ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
 if [ -d secret-keys ]; then
         CERTS="$(pwd)"/secret-keys
 fi
 
-cd $MODULE
+cd k-9
 # Use generic names
-sed -i -e 's,app_name">K-9 Mail,app_name">E-Mail,' app/ui/src/main/res/values-gl/strings.xml
-sed -i -e 's,shortcuts_title">K-9 Accounts,shortcuts_title">E-Mail Accounts,' app/ui/src/main/res/values/strings.xml
-sed -i -e 's,unread_widget_label">K-9 Unread,unread_widget_label">Unread email,' app/ui/src/main/res/values/strings.xml
+autoTranslate app/ui/legacy/src/main/res/values/strings.xml app_name E-Mail
+autoTranslate app/ui/legacy/src/main/res/values/strings.xml shortcuts_title "E-Mail Accounts"
+autoTranslate app/ui/legacy/src/main/res/values/strings.xml unread_widget_label "Unread email"
+
 
 if [ -n "$CERTS" ]; then
         P="$(cat $CERTS/aosp/password)"
