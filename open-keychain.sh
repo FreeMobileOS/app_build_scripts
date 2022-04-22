@@ -1,8 +1,9 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
+export NEED_SRC=false
 . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v4.9-beta1
+[ -z "$VERSION" ] && VERSION=v5.7.5
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -16,6 +17,10 @@ cd open-keychain
 git submodule update --init --recursive
 
 autoTranslate OpenKeychain/src/main/res/values/strings.xml app_name "Encryption"
+
+# FIXME stop forcing old javac when gradle's copy of groovyjarjarasm starts
+# supporting something newer
+export JAVA_HOME=/usr/lib/jvm/java-14-openjdk
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"

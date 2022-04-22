@@ -1,7 +1,7 @@
 #!/bin/sh
 # For a list of current Android compatible versions, see
 # http://omahaproxy.appspot.com/
-GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true enable_feed_in_chrome=false'
+GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true'
 # FIXME should probably switch to
 # GN_ARGS='target_os="android" target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="ChromeOS" enable_hevc_demuxing=true'
 # to get more codecs supported... But this causes ffmpeg build breakages without patching the code
@@ -34,6 +34,7 @@ cd src
 echo "target_os = [ 'android' ]" >>../.gclient
 if [ "$CHANNEL" = "head" ]; then
 	echo Using Chromium HEAD...
+	build/install-build-deps-android.sh
 	gclient sync
 	gclient runhooks
 else
@@ -59,13 +60,33 @@ else
 	gclient runhooks
 fi
 
+# Get rid of changes we may have applied during an earlier run
+git reset --hard
+
+# Make it build with python 3.11
+sed -i -e "s,'rU','r',g" tools/android/infobar_deprecation/infobar_deprecation_test.py tools/grit/grit/util.py PRESUBMIT_test_mocks.py third_party/angle/third_party/glmark2/src/waflib/Context.py third_party/angle/third_party/glmark2/src/waflib/ConfigSet.py third_party/blink/tools/blinkpy/third_party/pep8.py third_party/perfetto/infra/luci/recipes.py third_party/catapult/telemetry/telemetry/wpr/archive_info_unittest.py third_party/catapult/telemetry/third_party/pyfakefs/pyfakefs/fake_filesystem_test.py third_party/catapult/telemetry/third_party/altgraph/setup.py third_party/depot_tools/presubmit_canned_checks_test_mocks.py third_party/depot_tools/presubmit_support.py
+sed -i -e 's,"rU","r",g' third_party/catapult/telemetry/third_party/modulegraph/modulegraph/util.py third_party/catapult/telemetry/third_party/modulegraph/modulegraph/modulegraph.py third_party/pycoverage/coverage/backward.py
+
+# Drop GMS dependencies and other Google-isms
+# NOT YET --- these patches need rebasing all the time and aren't
+# that actively maintained. For now, microG is our friend
+if false; then
+	git clone https://git.droidware.info/wchen342/ungoogled-chromium-android
+	PB=1
+	for i in ungoogled-chromium-android/patches/ungoogled-chromium-android/*.patch; do
+		echo "Applying $i in $(pwd)"
+		patch -p1 -b -z .$PB~ <$i
+		PB=$((PB+1))
+	done
+fi
+
 # As of AOSP O 8.0.0_r17, the bundled system WebView's versionCode is 303012550
 # We need to outnumber that if we want to install an update...
 # We should also outnumber our own previous builds, so let's put a date code in there.
 # picking 379828897 as a base because it's sufficiently larger than 303012550 and it
 # will give our first build, done on 2017/11/03, a nice round number.
-#VERCODE=$((379828897+$(date +%Y%m%d)))
-#find . -name AndroidManifest.xml |xargs sed -i -e "s,android:versionCode=\"1\",android:versionCode=\"$VERCODE\",g"
+VERCODE=$((379828897+$(date +%Y%m%d)))
+find . -name AndroidManifest.xml |xargs sed -i -e "s,android:versionCode=\"1\",android:versionCode=\"$VERCODE\",g"
 
 # Let's not expect a "stupid user" knows what Chromium is...
 # And a more generic name should be translatable.
@@ -73,9 +94,9 @@ fi
 # lint throws a tantrum on any strings that aren't translated
 # into every language, so let's do our best...
 #
-for lng in am ar bg ca cs da de el en es es-rUS fa fi fr hi hr hu in it iw ja ko lt lv nb nl pl pt-rBR pt-rPT ro ru sk sl sr sv sw th tl tr uk vi zh-rCN zh-rTW ml mr ms et bn kn ta gu te; do
-	rm -rf chrome/android/java/res_chromium/values-$lng
-	cp -a chrome/android/java/res_chromium/values chrome/android/java/res_chromium/values-$lng
+for lng in am ar bg ca cs da de el es es-rUS fa fi fr hi hr hu in it iw ja ko lt lv nb nl pl pt-rBR pt-rPT ro ru sk sl sr sv sw th tl tr uk vi zh-rCN zh-rTW; do
+	rm -rf chrome/android/java/res_chromium_base/values-$lng
+	cp -a chrome/android/java/res_chromium_base/values chrome/android/java/res_chromium_base/values-$lng
 	case $lng in
 	de)
 		INTERNET="Internet"
@@ -95,14 +116,14 @@ for lng in am ar bg ca cs da de el en es es-rUS fa fi fr hi hr hu in it iw ja ko
 
 	echo $lng: $INTERNET_BOOKMARKS
 
-	sed -i -e "s,<string name=\"app_name\" translatable=\"false\">Chromium</string>,<string name=\"app_name\">$INTERNET</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
-	sed -i -e "s,<string name=\"bookmark_widget_title\" translatable=\"false\">Chromium bookmarks</string>,<string name=\"bookmark_widget_title\">$INTERNET_BOOKMARKS</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
-	sed -i -e "s,<string name=\"search_widget_title\" translatable=\"false\">Chromium search</string>,<string name=\"search_widget_title\">$INTERNET_SEARCH</string>," chrome/android/java/res_chromium/values-$lng/channel_constants.xml
-	sed -i -e "s,',\\\\',g" chrome/android/java/res_chromium/values-$lng/channel_constants.xml #'"
+	sed -i -e "s,<string name=\"app_name\" translatable=\"false\">Chromium</string>,<string name=\"app_name\">$INTERNET</string>," chrome/android/java/res_chromium_base/values-$lng/channel_constants.xml
+	sed -i -e "s,<string name=\"bookmark_widget_title\" translatable=\"false\">Chromium bookmarks</string>,<string name=\"bookmark_widget_title\">$INTERNET_BOOKMARKS</string>," chrome/android/java/res_chromium_base/values-$lng/channel_constants.xml
+	sed -i -e "s,<string name=\"search_widget_title\" translatable=\"false\">Chromium search</string>,<string name=\"search_widget_title\">$INTERNET_SEARCH</string>," chrome/android/java/res_chromium_base/values-$lng/channel_constants.xml
+	sed -i -e "s,',\\\\',g" chrome/android/java/res_chromium_base/values-$lng/channel_constants.xml #'"
 done
-sed -i -e 's,<string name="app_name" translatable="false">Chromium</string>,<string name="app_name">Internet</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
-sed -i -e 's,<string name="bookmark_widget_title" translatable="false">Chromium bookmarks</string>,<string name="bookmark_widget_title">Internet Bookmarks</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
-sed -i -e 's,<string name="search_widget_title" translatable="false">Chromium search</string>,<string name="search_widget_title">Internet Search</string>,' chrome/android/java/res_chromium/values/channel_constants.xml
+sed -i -e 's,<string name="app_name" translatable="false">Chromium</string>,<string name="app_name">Internet</string>,' chrome/android/java/res_chromium_base/values/channel_constants.xml
+sed -i -e 's,<string name="bookmark_widget_title" translatable="false">Chromium bookmarks</string>,<string name="bookmark_widget_title">Internet Bookmarks</string>,' chrome/android/java/res_chromium_base/values/channel_constants.xml
+sed -i -e 's,<string name="search_widget_title" translatable="false">Chromium search</string>,<string name="search_widget_title">Internet Search</string>,' chrome/android/java/res_chromium_base/values/channel_constants.xml
 
 gn gen --args="${GN_ARGS}" out/Release
 if $USE_MONOCHROME; then
