@@ -1,10 +1,10 @@
 #!/bin/sh
 MYDIR="$(dirname $(realpath $0))"
-OUTAPK=build/outputs/apk/silence-release.apk
+OUTAPK=build/outputs/apk/release/silence-release.apk
 MODULE=silence
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=v0.16.8-unstable
+[ -z "$VERSION" ] && VERSION=v0.16.12-unstable
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -20,6 +20,9 @@ git submodule init
 git submodule update
 
 echo "Preparing>>..$MODULE"
+
+# FIXME
+export JAVA_HOME=/usr/lib/jvm/java-12-openjdk
 
 if [ -n "$CERTS" ]; then
 	P="$(cat $CERTS/aosp/password)"
