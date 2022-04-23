@@ -56,7 +56,11 @@ function autoTranslate()
 	local ID="$1"
 	shift
 	# Replace string in untranslated file...
-	sed -i -E "s|<string name=\"$ID\">.*</string>|<string name=\"$ID\">$@</string>|" $F
+	if grep -q "<string name=\"$ID\"" $F; then
+		sed -i -E "s|<string name=\"$ID\">.*</string>|<string name=\"$ID\">$@</string>|" $F
+	else
+		sed -i -e "/<\/resources>/i	<string name=\"$ID\">$@<\/string>" $F
+	fi
 	local BASE=$(dirname $(dirname $F))
 	local FN=$(basename $F)
 	for i in ${BASE}/values-*/$FN; do
