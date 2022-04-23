@@ -23,7 +23,7 @@ android {
         }
 }
 EOF
-	fi
+		fi
 	fi
 }
 
@@ -34,14 +34,17 @@ REPO_NAME=https://github.com/nextcloud/android.git
 
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
-[ -z "$VERSION" ] && VERSION=stable-3.5.1
+[ -z "$VERSION" ] && VERSION=stable-3.19.1
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
 
+# FIXME
+#export JAVA_HOME=/usr/lib/jvm/java-16-openjdk
+
 # app
 if [ ! -d $MODULE ]; then
-git clone $REPO_NAME $MODULE --branch $VERSION --single-branch
+	git clone $REPO_NAME $MODULE --branch $VERSION --single-branch
 fi
 
 # sign key
@@ -59,7 +62,8 @@ sed -i -e 's,generic,fmo,' build.gradle
 if [ -n "$CERTS" ]; then
 	add_signature "build.gradle"
 	
-	./gradlew clean assemblefmoRelease
+	echo org.gradle.jvmargs=-Xmx4G >>gradle.properties
+	GRADLE_OPTS="-Xmx4G" ./gradlew clean assemblefmoRelease
 	cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
 else
 	echo "Warning: Debug build is not supported"
