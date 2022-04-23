@@ -14,7 +14,7 @@ if [ -d secret-keys ]; then
         CERTS="$(pwd)"/secret-keys
 fi
 
-export JAVA_HOME=/usr/lib/jvm/java-14-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-12-openjdk
 
 cd $MODULE
 
