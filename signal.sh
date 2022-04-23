@@ -3,7 +3,7 @@ MYDIR="$(dirname $(realpath $0))"
 [ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
 [ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 
-VERSION=4.37.1
+VERSION=5.36.2
 
 mkdir -p "$APP_ROOT_PATH"
 cd "$APP_ROOT_PATH"
@@ -12,6 +12,8 @@ cd "$APP_ROOT_PATH"
 if [ -d secret-keys ]; then
 	CERTS="$(pwd)"/secret-keys
 fi
+
+export JAVA_HOME=/usr/lib/jvm/java-14-openjdk
 
 cd Signal-Android
 
@@ -37,8 +39,8 @@ fi
 
 if [ -n "$CERTS" ]; then
         P="$(cat $CERTS/aosp/password)"
-        if ! grep -q fmo.jks build.gradle; then
-                cat >>build.gradle <<EOF
+        if ! grep -q fmo.jks app/build.gradle; then
+                cat >>app/build.gradle <<EOF
 android {
         signingConfigs {
                 release {
@@ -56,11 +58,11 @@ android {
 }
 EOF
 	fi
-    echo "release build"
+	echo "release build"
 	./gradlew assembleRelease
-	cp -f build/outputs/apk/website/release/Signal-website-armeabi-v7a-release-$VERSION.apk $PRODUCT_OUT_PATH/signal.apk
+	cp -f /tmp/appbuild.sxDbIK/Signal-Android/app/build/outputs/apk/websiteProd/release/Signal-Android-website-prod-arm64-v8a-release-unsigned-*.apk $PRODUCT_OUT_PATH/signal.apk
 else
-    echo "debug build"
+	echo "debug build"
 	./gradlew assembleDebug
 	cp -f build/outputs/apk/website/release/Signal-website-debug-$VERSION.apk $PRODUCT_OUT_PATH/signal.apk
 fi
