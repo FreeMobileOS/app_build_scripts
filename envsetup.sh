@@ -2,6 +2,11 @@
 # script to setup environment for app build
 
 export FMO_SCRIPT_DIR="$(realpath $(dirname $(echo ${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]})))"
+if [ -n "$SOURCE" ]; then
+	MODULE="$(basename $SOURCE .git)"
+else
+	MODULE="$(basename $0 .sh)"
+fi
 
 function warn_msg()
 {
@@ -134,7 +139,7 @@ function set_javahome()
 {
 	if [ -z "$JAVA_HOME" ]; then
 		JAVA_HOME="$(realpath $(dirname $(readlink -f $(which javac)))/..)"
-	[ -d "$JAVA_HOME" ] || unset JAVA_HOME
+		[ -d "$JAVA_HOME" ] || unset JAVA_HOME
 	fi
 	if [ -z "$JAVA_HOME" ]; then
 		echo "Enter the directory of your OpenJDK installation:"
@@ -233,6 +238,110 @@ function unset_var()
 	unset APP_ROOT_PATH
 	unset PRODUCT_OUT_PATH
 }
+
+function prepare_certs()
+{
+	if [ -e /media/space/repos/secret-keys/aosp/password ]; then
+		CERTS="/media/space/repos/secret-keys"
+	else
+		[ -e "$FMO_SCRIPT_DIR"/secret-keys/aosp/password ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys "$FMO_SCRIPT_DIR"/secret-keys
+		CERTS="$FMO_SCRIPT_DIR/secret-keys"
+	fi
+	if [ -e "$CERTS"/aosp/password ]; then
+		CERT_STORE="$CERTS/aosp/fmo.jks"
+		CERT_PW="$(cat $CERTS/aosp/password)"
+	else
+		unset CERTS
+		echo "You need to set up signing keys. Create a directory called" >&2
+		echo "secret-keys/aosp inside $FMO_SCRIPT_DIR" >&2
+		echo "Will try to continue without signing, this may or may not work." >&2
+	fi
+}
+
+function add_certs_to_gradle()
+{
+	[ -z "$CERTS" ] && prepare_certs
+	[ -z "$CERTS" ] && return
+	cat >>$1 <<EOF
+android {
+        signingConfigs {
+                release {
+                        storeFile file("$CERT_STORE")
+                        storePassword "$CERT_PW"
+                        keyAlias "apps"
+                        keyPassword "$CERT_PW"
+                }
+        }
+        buildTypes {
+                release {
+                        signingConfig signingConfigs.release
+                }
+        }
+}
+EOF
+}
+
+function force_java_version()
+{
+	# Unfortunately not all stuff can build with current
+	# OpenJDK -- some gradle plugins can't handle current
+	# class file versions, some stuff even requires the
+	# ancient OpenJDK that comes with AOSP
+	# This function sets the right locations for OpenMandriva,
+	# feel free to extend it with support for other OSes.
+	case "$1" in
+	8|9)
+		export JAVA_HOME=/usr/lib/jvm/java-1.$1.0
+		;;
+	*)
+		export JAVA_HOME=/usr/lib/jvm/java-$1-openjdk
+		;;
+	esac
+	if ! [ -e "$JAVA_HOME/bin/javac" ]; then
+		echo "Requested OpenJDK version $1 isn't installed, trying..."
+		sudo dnf --refresh --yes install java-$1-openjdk-devel
+		if ! [ -e "$JAVA_HOME"/bin/javac ]; then
+			echo "OpenJDK version requested by the build script not found and not installable." >&2
+			exit 1
+		fi
+	fi
+}
+
+function output()
+{
+	local DEST
+	if [ -n "$2" ]; then
+		DEST="$PRODUCT_OUT_PATH/$2.apk"
+	else
+		DEST="$PRODUCT_OUT_PATH/$MODULE.apk"
+	fi
+	if ! cp "$1" "$DEST"; then
+		echo "Expected output $1 wasn't generated." >&2
+		exit 1
+	fi
+}
+
+function checkout()
+{
+	git clone --recursive $SOURCE --branch $VERSION --single-branch --depth 1 --shallow-submodules --filter blob:limit=128k
+	cd "$MODULE"
+	if [ -d "$FMO_SCRIPT_DIR/patches/$MODULE" ]; then
+		for i in $FMO_SCRIPT_DIR/patches/$MODULE/*.patch; do
+			[ -e "$i" ] || continue
+			if ! git apply "$i"; then
+				echo "Patch $i failed to apply" >&2
+				exit 1
+			fi
+		done
+	fi
+}
+
+function cleanup()
+{
+	cd "$FMO_SCRIPT_DIR"
+	[ -n "$APP_ROOT_PATH" ] && rm -rf "$APP_ROOT_PATH"
+}
+
 ############################################################################
 # entry point of script: main
 ############################################################################
@@ -292,5 +401,11 @@ set_outpath
 #set path
 setpath
 
+prepare_certs
+
 #set app root
-[ "$NEED_ROOTPATH" = "false" ] || set_approotpath
+if [ "$NEED_ROOTPATH" != "false" ]; then
+	set_approotpath
+	mkdir -p "$APP_ROOT_PATH"
+	cd "$APP_ROOT_PATH"
+fi
