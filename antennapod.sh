@@ -21,3 +21,4 @@ EOF
 
 ./gradlew assembleRelease
 output app/build/outputs/apk/free/release/app-free-release.apk
+cleanup

@@ -2,10 +2,12 @@
 # script to setup environment for app build
 
 export FMO_SCRIPT_DIR="$(realpath $(dirname $(echo ${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]})))"
-if [ -n "$SOURCE" ]; then
-	MODULE="$(basename $SOURCE .git)"
-else
-	MODULE="$(basename $0 .sh)"
+if [ -z "$MODULE" ]; then
+	if [ -n "$SOURCE" ]; then
+		MODULE="$(basename $SOURCE .git)"
+	else
+		MODULE="$(basename $0 .sh)"
+	fi
 fi
 
 function warn_msg()
@@ -336,7 +338,7 @@ function output()
 
 function checkout()
 {
-	git clone --recursive $SOURCE --branch $VERSION --single-branch --depth 1 --shallow-submodules --filter blob:limit=128k
+	git clone --recursive "$SOURCE" --branch "$VERSION" --single-branch --depth 1 --shallow-submodules --filter blob:limit=128k "$MODULE"
 	cd "$MODULE"
 	if [ -d "$FMO_SCRIPT_DIR/patches/$MODULE" ]; then
 		for i in $FMO_SCRIPT_DIR/patches/$MODULE/*.patch; do
