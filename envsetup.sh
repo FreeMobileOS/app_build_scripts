@@ -331,7 +331,7 @@ function output()
 		DEST="$PRODUCT_OUT_PATH/$MODULE.apk"
 	fi
 	if ! cp "$1" "$DEST"; then
-		echo "Expected output $1 wasn't generated." >&2
+		echo "Expected output $1 wasn't generated in $APP_ROOT_PATH." >&2
 		exit 1
 	fi
 }
