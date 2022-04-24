@@ -1,47 +1,19 @@
 #!/bin/sh
-MYDIR="$(dirname $(realpath $0))"
-OUTAPK=vector/build/outputs/apk/fdroid/release/vector-fdroid-arm64-v8a-release.apk
-MODULE=element
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
-[ -z "$APP_ROOT_PATH" ] && APP_ROOT_PATH=$MYDIR
 [ -z "$VERSION" ] && VERSION=v1.4.12
+MYDIR="$(dirname $(realpath $0))"
+SOURCE=git@github.com:vector-im/element-android.git
+MODULE=element
+. ${MYDIR}/envsetup.sh
 
-mkdir -p "$APP_ROOT_PATH"
-cd "$APP_ROOT_PATH"
-[ -d $MODULE ] || git clone git@github.com:vector-im/element-android.git $MODULE --branch $VERSION --single-branch
-[ -d secret-keys ] || git clone git@github.com:OpenMandrivaAssociation/secret-keys
-if [ -d secret-keys ]; then
-        CERTS="$(pwd)"/secret-keys
-fi
+checkout
+force_java_version 12
 
-export JAVA_HOME=/usr/lib/jvm/java-12-openjdk
+sed -i	-e "s,^signing.element.storePath=.*,signing.element.storePath=$CERT_STORE," \
+	-e "s,^signing.element.storePassword=.*,signing.element.storePassword=$CERT_PW," \
+	-e "s,^signing.element.keyId=.*,signing.element.keyId=apps," \
+	-e "s,^signing.element.keyPassword=.*,signing.element.keyPassword=$CERT_PW," \
+	gradle.properties
+sed -i	-e 's,// signingConfig,signingConfig,' vector/build.gradle
 
-cd $MODULE
-
-if [ -n "$CERTS" ]; then
-        P="$(cat $CERTS/aosp/password)"
-        if ! grep -q fmo.jks vector/build.gradle; then
-                cat >>vector/build.gradle <<EOF
-android {
-        signingConfigs {
-                release {
-                        storeFile file("$CERTS/aosp/fmo.jks")
-                        storePassword "$P"
-                        keyAlias "apps"
-                        keyPassword "$P"
-                }
-        }
-        buildTypes {
-                release {
-                        signingConfig signingConfigs.release
-                }
-        }
-}
-EOF
-        fi
-        ./gradlew clean
-        ./gradlew assembleFDroidRelease
-        cp -f $OUTAPK $PRODUCT_OUT_PATH/$MODULE.apk
-else
-    echo "Warning: Debug build is not supported"
-fi
+./gradlew assembleFDroidRelease
+output vector/build/outputs/apk/fdroid/release/vector-fdroid-arm64-v8a-release.apk
