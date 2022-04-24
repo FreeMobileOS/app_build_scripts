@@ -281,6 +281,19 @@ android {
 EOF
 }
 
+function sign_apk()
+{
+	local ALIGNED="$(echo $1 |sed -e 's,\.apk$,-aligned.apk,')"
+	local SIGNED
+	if echo $1 |grep -q -- -unsigned; then
+		SIGNED="$(echo $1 |sed -e 's,-unsigned,-signed,')"
+	else
+		SIGNED="$(echo $1 |sed -e 's,\.apk$,-signed.apk,')"
+	fi
+	$ANDROID_SDK_PATH/build-tools/32.0.0/zipalign -v -p 8 "$1" "$ALIGNED"
+	$ANDROID_SDK_PATH/build-tools/32.0.0/apksigner sign --ks "$CERT_STORE" --out "$SIGNED"
+}
+
 function force_java_version()
 {
 	# Unfortunately not all stuff can build with current
