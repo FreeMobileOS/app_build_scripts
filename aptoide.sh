@@ -3,7 +3,7 @@
 MYDIR="$(dirname $(realpath $0))"
 SOURCE=git@github.com:Aptoide/aptoide-client-v8
 MODULE=aptoide
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 
 checkout
 # Use generic names
