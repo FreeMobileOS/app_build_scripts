@@ -3,7 +3,7 @@
 MYDIR="$(dirname $(realpath $0))"
 SOURCE=git@github.com:k9mail/k-9
 MODULE=k9mail
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 
 checkout
 

@@ -2,7 +2,7 @@
 [ -z "$VERSION" ] && VERSION=v1.22.1
 SOURCE=git@github.com:martykan/forecastie.git
 MYDIR="$(dirname $(realpath $0))"
-[ -z "$ANDROID_HOME" ] && . ${MYDIR}/envsetup.sh
+. ${MYDIR}/envsetup.sh
 
 checkout
 if [ -e "${CERTS}/services/openweathermap" ]; then
