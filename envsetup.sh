@@ -64,7 +64,8 @@ function autoTranslate()
 	shift
 	# Replace string in untranslated file...
 	if grep -q "<string name=\"$ID\"" $F; then
-		sed -i -E "s|<string name=\"$ID\">.*</string>|<string name=\"$ID\">$@</string>|" $F
+		# We may also need to get rid of 'translatable="false"'
+		sed -i -E "s|<string name=\"$ID\".*</string>|<string name=\"$ID\">$@</string>|" $F
 	else
 		sed -i -e "/<\/resources>/i	<string name=\"$ID\">$@<\/string>" $F
 	fi
