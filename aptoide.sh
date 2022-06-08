@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION='v9.20.4.0(10115)'
+[ -z "$VERSION" ] && VERSION='v9.20.5.1(12002)'
 MYDIR="$(dirname $(realpath $0))"
 SOURCE=git@github.com:Aptoide/aptoide-client-v8
 MODULE=aptoide
