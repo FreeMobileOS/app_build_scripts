@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION=v0.22.2
+[ -z "$VERSION" ] && VERSION=v0.23.0
 SOURCE=git@github.com:TeamNewPipe/NewPipe.git
 MYDIR="$(dirname $(realpath $0))"
 MODULE=newpipe
