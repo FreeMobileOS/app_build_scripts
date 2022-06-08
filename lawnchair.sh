@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION=12-dev
+[ -z "$VERSION" ] && VERSION=12.1-dev
 MYDIR="$(dirname $(realpath $0))"
 SOURCE=git@github.com:LawnchairLauncher/lawnchair
 . ${MYDIR}/envsetup.sh
