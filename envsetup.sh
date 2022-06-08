@@ -156,7 +156,12 @@ function set_ndkpath()
 # ndk path
 	if [ -z "$ANDROID_NDK_PATH" ] ; then
 		[ -d /opt/android-ndk ] && ANDROID_NDK_PATH=/opt/android-ndk
-		[ -d ~/Android/Sdk/ndk-bundle ] && ANDROID_NDK_PATH=$(realpath ~/Android/Sdk/ndk-bundle)
+		if echo $NEED_NDK |grep -qE '^[0-9]'; then
+			# specific NDK version requested
+			[ -d $ANDROID_SDK_PATH/ndk-bundle ] && ANDROID_NDK_PATH=$ANDROID_SDK_PATH/ndk/$NEED_NDK
+		else
+			[ -d $ANDROID_SDK_PATH/ndk-bundle ] && ANDROID_NDK_PATH=$ANDROID_SDK_PATH/ndk-bundle
+		fi
 	fi
 	if [ -z "$ANDROID_NDK_PATH" ] ; then
 		echo "Enter Android ndk path:"
@@ -294,7 +299,7 @@ function sign_apk()
 		SIGNED="$(echo $1 |sed -e 's,\.apk$,-signed.apk,')"
 	fi
 	$ANDROID_SDK_PATH/build-tools/32.0.0/zipalign -v -p 8 "$1" "$ALIGNED"
-	$ANDROID_SDK_PATH/build-tools/32.0.0/apksigner sign --ks "$CERT_STORE" --out "$SIGNED"
+	$ANDROID_SDK_PATH/build-tools/32.0.0/apksigner sign --ks "$CERT_STORE" --ks-pass "pass:$CERT_PW" --ks-key-alias apps --key-pass "pass:$CERT_PW" --in "$ALIGNED" --out "$SIGNED"
 }
 
 function force_java_version()
@@ -394,11 +399,11 @@ done
 # set JAVA_HOME
 [ "$NEED_JAVA_HOME" = "false" ] || set_javahome
 
-# set ndk path
-[ "$NEED_NDK" = "false" ] || set_ndkpath
-
 # set sdk path
 [ "$NEED_SDK" = "false" ] || set_sdkpath
+
+# set ndk path
+[ "$NEED_NDK" = "false" ] || set_ndkpath
 
 # set android source path
 [ "$NEED_SRC" = "true" ] && set_androidsrcpath
