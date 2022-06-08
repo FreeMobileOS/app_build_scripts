@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION="2.5.1"
+[ -z "$VERSION" ] && VERSION="2.5.2"
 SOURCE=git@github.com:AntennaPod/AntennaPod
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
