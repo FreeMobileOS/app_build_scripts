@@ -289,6 +289,29 @@ android {
 EOF
 }
 
+function add_certs_to_gradle_kts()
+{
+	[ -z "$CERTS" ] && prepare_certs
+	[ -z "$CERTS" ] && return
+	cat >>$1 <<EOF
+android {
+        signingConfigs {
+		create("release") {
+                        storeFile = file("$CERT_STORE")
+                        storePassword = "$CERT_PW"
+                        keyAlias = "apps"
+                        keyPassword = "$CERT_PW"
+                }
+        }
+        buildTypes {
+		getByName("release") {
+			signingConfig = signingConfigs.getByName("release")
+                }
+        }
+}
+EOF
+}
+
 function sign_apk()
 {
 	local ALIGNED="$(echo $1 |sed -e 's,\.apk$,-aligned.apk,')"
