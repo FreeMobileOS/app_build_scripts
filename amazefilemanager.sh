@@ -1,13 +1,11 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION=v3.6.7
+[ -z "$VERSION" ] && VERSION=v3.7.0
 SOURCE=git@github.com:TeamAmaze/AmazeFileManager.git
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
 
-# FIXME Stupid, dumb Android SDK freaks out on any JDK not
-# 3 decades old
-force_java_version 8
-
+# https://youtrack.jetbrains.com/issue/KT-45545
+force_java_version 14
 checkout
 
 cat >signing.properties <<EOF
@@ -19,5 +17,4 @@ EOF
 
 ./gradlew clean assembleFdroid
 output app/build/outputs/apk/fdroid/release/app-fdroid-release.apk
-
 cleanup
