@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=6.12.0
+VERSION=6.12.1
 SOURCE=git@github.com:SimpleMobileTools/Simple-Notes.git
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
