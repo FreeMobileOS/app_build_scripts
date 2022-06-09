@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION=v5.36.2
+[ -z "$VERSION" ] && VERSION=v5.40.4
 SOURCE=git@github.com:signalapp/Signal-Android
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
