@@ -72,7 +72,7 @@ sed -i -e "s,'rU','r',g" tools/android/infobar_deprecation/infobar_deprecation_t
 sed -i -e 's,"rU","r",g' third_party/catapult/telemetry/third_party/modulegraph/modulegraph/util.py third_party/catapult/telemetry/third_party/modulegraph/modulegraph/modulegraph.py third_party/pycoverage/coverage/backward.py
 
 # Drop GMS dependencies and other Google-isms
-git clone https://git.droidware.info/ungoogled-software/ungoogled-chromium
+git clone https://github.com/ungoogled-software/ungoogled-chromium
 PB=1
 for i in $(cat ungoogled-chromium/patches/series); do
 	echo "Applying $i in $(pwd)"
