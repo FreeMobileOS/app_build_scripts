@@ -24,12 +24,16 @@ unset NEED_NDK
 unset NEED_SRC
 unset NEED_ROOTPATH
 
-git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+[ -d depot_tools ] || git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 export PATH=/opt/legacy:$PATH:$(pwd)/depot_tools
 mkdir chromium
 cd chromium
 # May want to add --no-history -- will that break branches?
-fetch --nohooks android
+fetch --nohooks --no-history android
+if ! [ -d src ]; then
+	echo "gclient fetch failed"
+	exit 1
+fi
 cd src
 echo "target_os = [ 'android' ]" >>../.gclient
 if [ "$CHANNEL" = "head" ]; then
@@ -60,6 +64,11 @@ else
 	gclient runhooks
 fi
 
+if ! [ -e third_party/depot_tools/presubmit_support.py ]; then
+	echo "Checkout failed sanity checks, probably download error"
+	exit 1
+fi
+
 # Get rid of changes we may have applied during an earlier run
 git reset --hard
 
@@ -68,17 +77,16 @@ sed -i -e "s,'rU','r',g" tools/android/infobar_deprecation/infobar_deprecation_t
 sed -i -e 's,"rU","r",g' third_party/catapult/telemetry/third_party/modulegraph/modulegraph/util.py third_party/catapult/telemetry/third_party/modulegraph/modulegraph/modulegraph.py third_party/pycoverage/coverage/backward.py
 
 # Drop GMS dependencies and other Google-isms
-# NOT YET --- these patches need rebasing all the time and aren't
-# that actively maintained. For now, microG is our friend
-if false; then
-	git clone https://git.droidware.info/wchen342/ungoogled-chromium-android
-	PB=1
-	for i in ungoogled-chromium-android/patches/ungoogled-chromium-android/*.patch; do
-		echo "Applying $i in $(pwd)"
-		patch -p1 -b -z .$PB~ <$i
-		PB=$((PB+1))
-	done
-fi
+git clone https://git.droidware.info/ungoogled-software/ungoogled-chromium
+PB=1
+for i in $(cat ungoogled-chromium/patches/series); do
+	echo "Applying $i in $(pwd)"
+	patch -p1 -b -z .$PB~ <ungoogled-chromium/patches/$i
+	PB=$((PB+1))
+done
+# FIXME there may be more useful patches in
+# https://git.droidware.info/wchen342/ungoogled-chromium-android
+# but it is usually months if not years behind upstream releases
 
 # As of AOSP O 8.0.0_r17, the bundled system WebView's versionCode is 303012550
 # We need to outnumber that if we want to install an update...
