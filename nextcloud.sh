@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION=stable-3.19.1
+[ -z "$VERSION" ] && VERSION=stable-3.20.1
 SOURCE=https://github.com/nextcloud/android.git
 MODULE=nextcloud
 MYDIR="$(dirname $(realpath $0))"
@@ -7,13 +7,9 @@ MYDIR="$(dirname $(realpath $0))"
 
 checkout
 
-# create fmo flavor
-mv src/generic src/fmo
-sed -i -e 's,generic,fmo,' build.gradle
-
-add_certs_to_gradle "build.gradle"
+add_certs_to_gradle "app/build.gradle"
 	
 echo org.gradle.jvmargs=-Xmx4G >>gradle.properties
-GRADLE_OPTS="-Xmx4G" ./gradlew clean assemblefmoRelease
+GRADLE_OPTS="-Xmx4G" ./gradlew clean assembleRelease
 output build/outputs/apk/fmo/release/fmo-release-*.apk
 cleanup
