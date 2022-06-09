@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION=v1.4.12
+[ -z "$VERSION" ] && VERSION=v1.4.19
 MYDIR="$(dirname $(realpath $0))"
 SOURCE=git@github.com:vector-im/element-android.git
 MODULE=element
