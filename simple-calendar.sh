@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=6.18.1
+VERSION=6.18.3
 SOURCE=git@github.com:SimpleMobileTools/Simple-Calendar.git
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
