@@ -1,5 +1,5 @@
 #!/bin/sh
-[ -z "$VERSION" ] && VERSION=2022.03.23-4-android
+[ -z "$VERSION" ] && VERSION=2022.05.31-10-android
 SOURCE=git@github.com:organicmaps/organicmaps
 MYDIR="$(dirname $(realpath $0))"
 MODULE=organicmaps
