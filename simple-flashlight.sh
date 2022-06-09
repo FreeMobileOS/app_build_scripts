@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=5.6.0
+VERSION=5.6.1
 SOURCE=git@github.com:SimpleMobileTools/Simple-Flashlight.git
 MYDIR="$(dirname $(realpath $0))"
 . ${MYDIR}/envsetup.sh
