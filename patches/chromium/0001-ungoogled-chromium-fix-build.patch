@@ -1,0 +1,33 @@
+diff -up chromium/src/components/domain_reliability/google_configs.cc.omv~ chromium/src/components/domain_reliability/google_configs.cc
+--- chromium/src/components/domain_reliability/google_configs.cc.omv~	2022-06-10 05:11:59.015524695 +0200
++++ chromium/src/components/domain_reliability/google_configs.cc	2022-06-10 05:12:33.783596761 +0200
+@@ -13,8 +13,8 @@ namespace domain_reliability {
+ 
+ std::unique_ptr<const DomainReliabilityConfig> MaybeGetGoogleConfig(
+     const std::string& hostname) {
+-  bool is_www_subdomain =
+-      base::StartsWith(hostname, "www.", base::CompareCase::SENSITIVE);
++/*  bool is_www_subdomain =
++      base::StartsWith(hostname, "www.", base::CompareCase::SENSITIVE); */
+   std::string hostname_parent = net::GetSuperdomain(hostname);
+ 
+   std::unique_ptr<const DomainReliabilityConfig> config;
+diff -up chromium/src/components/domain_reliability/uploader.cc.omv~ chromium/src/components/domain_reliability/uploader.cc
+--- chromium/src/components/domain_reliability/uploader.cc.omv~	2022-06-10 05:12:50.883632618 +0200
++++ chromium/src/components/domain_reliability/uploader.cc	2022-06-10 05:14:13.781809966 +0200
+@@ -88,6 +88,7 @@ class DomainReliabilityUploaderImpl : pu
+       return;
+     }
+ 
++#if 0
+     net::NetworkTrafficAnnotationTag traffic_annotation =
+         net::DefineNetworkTrafficAnnotation("domain_reliability_report_upload",
+                                             R"(
+@@ -137,6 +138,7 @@ class DomainReliabilityUploaderImpl : pu
+         std::make_pair(std::move(request), std::move(callback)));
+     DCHECK(inserted);
+     it->first->Start();
++#endif
+   }
+ 
+   void SetDiscardUploads(bool discard_uploads) override {

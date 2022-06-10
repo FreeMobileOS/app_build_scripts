@@ -1,7 +1,7 @@
 #!/bin/sh
 # For a list of current Android compatible versions, see
 # http://omahaproxy.appspot.com/
-GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true'
+GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true safe_browsing_mode=0 enable_reporting=false enable_supervised_users=false is_cfi=true is_component_build=false rtc_build_examples=false use_cfi_cast=true use_official_google_api_keys=false'
 # FIXME should probably switch to
 # GN_ARGS='target_os="android" target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="ChromeOS" enable_hevc_demuxing=true'
 # to get more codecs supported... But this causes ffmpeg build breakages without patching the code
@@ -23,6 +23,16 @@ unset NEED_ROOTPATH
 export PATH=/opt/legacy:$PATH:$(pwd)/depot_tools
 mkdir chromium
 cd chromium
+if [ -d src ]; then
+	# Undo changes from previous checkout... they'll be
+	# redone anyway
+	find src -name .git |while read r;  do
+		cd $r/..
+		git reset --hard
+		git clean -d -f -x
+		cd -
+	done
+fi
 # May want to add --no-history -- will that break branches?
 fetch --nohooks --no-history android
 if ! [ -d src ]; then
@@ -64,9 +74,6 @@ if ! [ -e third_party/depot_tools/presubmit_support.py ]; then
 	exit 1
 fi
 
-# Get rid of changes we may have applied during an earlier run
-git reset --hard
-
 # Make it build with python 3.11
 sed -i -e "s,'rU','r',g" tools/android/infobar_deprecation/infobar_deprecation_test.py tools/grit/grit/util.py PRESUBMIT_test_mocks.py third_party/angle/third_party/glmark2/src/waflib/Context.py third_party/angle/third_party/glmark2/src/waflib/ConfigSet.py third_party/blink/tools/blinkpy/third_party/pep8.py third_party/perfetto/infra/luci/recipes.py third_party/catapult/telemetry/telemetry/wpr/archive_info_unittest.py third_party/catapult/telemetry/third_party/pyfakefs/pyfakefs/fake_filesystem_test.py third_party/catapult/telemetry/third_party/altgraph/setup.py third_party/depot_tools/presubmit_canned_checks_test_mocks.py third_party/depot_tools/presubmit_support.py
 sed -i -e 's,"rU","r",g' third_party/catapult/telemetry/third_party/modulegraph/modulegraph/util.py third_party/catapult/telemetry/third_party/modulegraph/modulegraph/modulegraph.py third_party/pycoverage/coverage/backward.py
@@ -77,6 +84,12 @@ PB=1
 for i in $(cat ungoogled-chromium/patches/series); do
 	echo "Applying $i in $(pwd)"
 	patch -p1 -b -z .$PB~ <ungoogled-chromium/patches/$i
+	PB=$((PB+1))
+done
+PB=1000
+for i in ../../patches/chromium/*patch; do
+	echo "Applying $i in $(pwd)"
+	patch -p1 -b -z .$PB~ <$i
 	PB=$((PB+1))
 done
 # FIXME there may be more useful patches in
