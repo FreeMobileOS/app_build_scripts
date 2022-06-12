@@ -1,10 +1,6 @@
 #!/bin/sh
 # For a list of current Android compatible versions, see
 # http://omahaproxy.appspot.com/
-GN_ARGS='target_os="android" target_cpu="arm64" is_debug=false is_official_build=true is_chrome_branded=false enable_resource_whitelist_generation=true ffmpeg_branding="Chrome" proprietary_codecs=true enable_remoting=true safe_browsing_mode=0 enable_reporting=false enable_supervised_users=false is_cfi=true is_component_build=false rtc_build_examples=false use_cfi_cast=true use_official_google_api_keys=false'
-# FIXME should probably switch to
-# GN_ARGS='target_os="android" target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="ChromeOS" enable_hevc_demuxing=true'
-# to get more codecs supported... But this causes ffmpeg build breakages without patching the code
 # 
 # Available channels: head, canary, dev, beta, stable
 [ -z "$CHANNEL" ] && CHANNEL=dev
@@ -18,6 +14,12 @@ export NEED_ROOTPATH=false
 unset NEED_NDK
 unset NEED_SRC
 unset NEED_ROOTPATH
+
+# Trichrome is a way to theoretically merge WebView and Chromium
+# and use fewer resources -- but in practice the TriChrome based
+# WebView doesn't seem to work as system webview.
+# So let's build the traditional way for now
+USE_TRICHROME=false
 
 [ -d depot_tools ] || git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 export PATH=/opt/legacy:$PATH:$(pwd)/depot_tools
@@ -44,7 +46,7 @@ echo "target_os = [ 'android' ]" >>../.gclient
 if [ "$CHANNEL" = "head" ]; then
 	echo Using Chromium HEAD...
 	build/install-build-deps-android.sh
-	gclient sync
+	gclient sync -D --force
 	gclient runhooks
 else
 	VERSIONS=$(wget -O - "https://omahaproxy.appspot.com/all?os=android&channel=$CHANNEL" |tail -n1)
@@ -65,7 +67,7 @@ else
 	CURRENT_VERSION=$(echo ${VERSIONS} |cut -d, -f3)
 	echo Using Chromium ${CURRENT_VERSION}...
 	COMMIT=$(echo ${VERSIONS} |cut -d, -f9)
-	gclient sync -r ${COMMIT}
+	gclient sync -D --force -r ${COMMIT}
 	gclient runhooks
 fi
 
@@ -79,11 +81,19 @@ sed -i -e "s,'rU','r',g" tools/android/infobar_deprecation/infobar_deprecation_t
 sed -i -e 's,"rU","r",g' third_party/catapult/telemetry/third_party/modulegraph/modulegraph/util.py third_party/catapult/telemetry/third_party/modulegraph/modulegraph/modulegraph.py third_party/pycoverage/coverage/backward.py
 
 # Drop GMS dependencies and other Google-isms
-git clone https://github.com/ungoogled-software/ungoogled-chromium
+if [ -d bromite ]; then
+	cd bromite
+	git reset --hard
+	git clean -d -f -x
+	git pull
+	cd ..
+else
+	git clone https://github.com/bromite/bromite
+fi
 PB=1
-for i in $(cat ungoogled-chromium/patches/series); do
+for i in $(cat bromite/build/bromite_patches_list.txt); do
 	echo "Applying $i in $(pwd)"
-	patch -p1 -b -z .$PB~ <ungoogled-chromium/patches/$i
+	git apply bromite/build/patches/$i
 	PB=$((PB+1))
 done
 PB=1000
@@ -93,8 +103,13 @@ for i in ../../patches/chromium/*patch; do
 	PB=$((PB+1))
 done
 # FIXME there may be more useful patches in
-# https://git.droidware.info/wchen342/ungoogled-chromium-android
+# https://github.com/ungoogled-software/ungoogled-chromium-android
 # but it is usually months if not years behind upstream releases
+
+# Let's be compatible with stuff that tries to use the system webview by name
+sed -i -e '/system_webview_package_name/d' bromite/build/bromite.gn_args
+
+GN_ARGS="$(cat bromite/build/bromite.gn_args) target_cpu=\"arm64\" is_chrome_branded=false use_sysroot=true"
 
 # As of AOSP O 8.0.0_r17, the bundled system WebView's versionCode is 303012550
 # We need to outnumber that if we want to install an update...
@@ -145,19 +160,29 @@ sed -i -e 's,<string name="bookmark_widget_title" translatable="false">Chromium 
 sed -i -e 's,<string name="search_widget_title" translatable="false">Chromium search</string>,<string name="search_widget_title">Internet Search</string>,' chrome/android/java/res_chromium_base/values/channel_constants.xml
 
 gn gen --args="${GN_ARGS}" out/Release
-ninja -C out/Release trichrome_chrome_bundle trichrome_webview_bundle
+if $USE_TRICHROME; then
+	ninja -C out/Release trichrome_chrome_bundle trichrome_webview_bundle
+else
+	ninja -C out/Release chrome_modern_public_bundle system_webview_apk
+fi
 
 prepare_certs
 APKSIGN_CMD_PATH=$(find $ANDROID_HOME -name apksigner | head -n 1)
 BUNDLETOOL=$PRODUCT_OUT_PATH/bundletool
 [ -x "$BUNDLETOOL" ] || ${MYDIR}/bundletool.sh
-$BUNDLETOOL build-apks --bundle=out/Release/apks/TrichromeChrome.aab --output=$PRODUCT_OUT_PATH/chromium.apks --overwrite --ks="$CERT_STORE" --ks-pass="pass:$CERT_PW" --ks-key-alias=apps --key-pass="pass:$CERT_PW" --mode=universal
-$BUNDLETOOL build-apks --bundle=out/Release/apks/TrichromeWebView.aab --output=$PRODUCT_OUT_PATH/webview.apks --overwrite --ks="$CERT_STORE" --ks-pass="pass:$CERT_PW" --ks-key-alias=apps --key-pass="pass:$CERT_PW" --mode=universal
-cp out/Release/apks/TrichromeLibrary.apk $PRODUCT_OUT_PATH/
+if $USE_TRICHROME; then
+	$BUNDLETOOL build-apks --bundle=out/Release/apks/TrichromeChrome.aab --output=$PRODUCT_OUT_PATH/chromium.apks --overwrite --ks="$CERT_STORE" --ks-pass="pass:$CERT_PW" --ks-key-alias=apps --key-pass="pass:$CERT_PW" --mode=universal
+	$BUNDLETOOL build-apks --bundle=out/Release/apks/TrichromeWebView.aab --output=$PRODUCT_OUT_PATH/webview.apks --overwrite --ks="$CERT_STORE" --ks-pass="pass:$CERT_PW" --ks-key-alias=apps --key-pass="pass:$CERT_PW" --mode=universal
+	cp out/Release/apks/TrichromeLibrary.apk $PRODUCT_OUT_PATH/
+	cd $PRODUCT_OUT_PATH
+	bsdtar xf webview.apks
+	mv universal.apk webview.apk
+	rm toc.pb webview.apks
+else
+	$BUNDLETOOL build-apks --bundle=out/Release/apks/ChromeModernPublic.aab --output=$PRODUCT_OUT_PATH/chromium.apks --overwrite --ks="$CERT_STORE" --ks-pass="pass:$CERT_PW" --ks-key-alias=apps --key-pass="pass:$CERT_PW" --mode=universal
+	cp out/Release/apks/SystemWebView.apk "$PRODUCT_OUT_PATH/webview.apk"
+fi
 cd $PRODUCT_OUT_PATH
 bsdtar xf chromium.apks
-mv universal.apk chromium.apk
+mv universal.apks chromium.apk
 rm toc.pb chromium.apks
-bsdtar xf webview.apks
-mv universal.apk webview.apk
-rm toc.pb webview.apks
