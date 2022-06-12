@@ -184,5 +184,5 @@ else
 fi
 cd $PRODUCT_OUT_PATH
 bsdtar xf chromium.apks
-mv universal.apks chromium.apk
+mv universal.apk chromium.apk
 rm toc.pb chromium.apks
